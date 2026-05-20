@@ -4,34 +4,42 @@ import PageWrapper from '../components/PageWrapper';
 
 export default function Wishlist() {
   const { restaurants } = useRestaurants();
-  const wishlist = restaurants.filter((r) => r.status === 'wishlist');
+  const wishlist = restaurants.filter(r => r.status === 'wishlist');
 
   return (
     <PageWrapper>
-      {/* Page header */}
-      <div className="rounded-2xl p-5 mb-5" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)', border: '1px solid #fed7aa' }}>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm">❤️</div>
-          <div>
-            <h1 className="text-xl font-extrabold text-gray-900">Wishlist</h1>
-            <p className="text-sm text-orange-600 font-medium">{wishlist.length} places to visit</p>
-          </div>
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-6">
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0"
+          style={{ background: 'linear-gradient(135deg, #ff5c28 0%, #ff7d45 100%)' }}
+        >
+          ❤️
+        </div>
+        <div>
+          <h1 className="text-2xl font-extrabold text-gray-900 leading-tight">Wishlist</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {wishlist.length} {wishlist.length === 1 ? 'place' : 'places'} to visit
+          </p>
         </div>
       </div>
 
       {wishlist.length === 0 ? (
-        <div className="text-center py-20">
-          <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">❤️</div>
-          <p className="text-gray-800 font-bold text-lg">Your wishlist is empty</p>
-          <p className="text-gray-400 text-sm mt-2 max-w-xs mx-auto">
-            Tap <span className="font-semibold text-orange-500">+ Add</span> to save restaurants you want to visit
+        <div className="flex flex-col items-center text-center py-16 px-6">
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-5"
+            style={{ backgroundColor: '#fff7ed' }}
+          >
+            ❤️
+          </div>
+          <p className="text-xl font-bold text-gray-800">Your wishlist is empty</p>
+          <p className="text-gray-400 text-sm mt-2 leading-relaxed max-w-xs">
+            Tap <span className="font-semibold text-orange-500">+ Add</span> to save a restaurant you want to visit
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {wishlist.map((r) => (
-            <RestaurantCard key={r.id} restaurant={r} />
-          ))}
+          {wishlist.map(r => <RestaurantCard key={r.id} restaurant={r} />)}
         </div>
       )}
     </PageWrapper>

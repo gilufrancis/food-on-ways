@@ -1,111 +1,114 @@
 import { useRestaurants } from '../context/RestaurantContext';
 import PageWrapper from '../components/PageWrapper';
 
-const STAT_CONFIG = [
-  { key: 'total',    icon: '🗂️', label: 'Total Saved',  color: '#6366f1', bg: '#eef2ff' },
-  { key: 'visited',  icon: '✅', label: 'Visited',       color: '#16a34a', bg: '#f0fdf4' },
-  { key: 'wishlist', icon: '❤️', label: 'Wishlist',      color: '#ea580c', bg: '#fff7ed' },
-  { key: 'cuisine',  icon: '🍴', label: 'Fav Cuisine',   color: '#d97706', bg: '#fffbeb' },
-];
+const BRAND = 'linear-gradient(135deg, #ff5c28 0%, #ff7d45 100%)';
 
 export default function Profile() {
   const { restaurants } = useRestaurants();
 
-  const total = restaurants.length;
-  const visited = restaurants.filter((r) => r.status === 'visited').length;
-  const wishlist = restaurants.filter((r) => r.status === 'wishlist').length;
+  const total    = restaurants.length;
+  const visited  = restaurants.filter(r => r.status === 'visited').length;
+  const wishlist = restaurants.filter(r => r.status === 'wishlist').length;
 
   const cuisineCounts = {};
-  restaurants.forEach((r) => {
+  restaurants.forEach(r => {
     if (r.cuisine) cuisineCounts[r.cuisine] = (cuisineCounts[r.cuisine] || 0) + 1;
   });
   const favCuisine = Object.entries(cuisineCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
 
-  const statsValues = { total, visited, wishlist, cuisine: favCuisine };
+  const rated = restaurants.filter(r => r.status === 'visited' && r.rating);
+  const avgRating = rated.length
+    ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1)
+    : null;
 
   const recent = [...restaurants]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
-
-  const visitedRated = restaurants.filter((r) => r.status === 'visited' && r.rating);
-  const avgRating = visitedRated.length
-    ? (visitedRated.reduce((s, r) => s + r.rating, 0) / visitedRated.length).toFixed(1)
-    : null;
+    .slice(0, 6);
 
   return (
     <PageWrapper>
-      {/* Profile hero */}
-      <div
-        className="rounded-2xl p-5 mb-6 text-white"
-        style={{ background: 'linear-gradient(135deg, #ff5c28 0%, #ff8c42 100%)' }}
-      >
+      {/* ── Hero ── */}
+      <div className="rounded-3xl p-5 mb-6 text-white" style={{ background: BRAND }}>
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center text-3xl shrink-0">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}
+          >
             🍽️
           </div>
-          <div>
-            <h1 className="text-xl font-extrabold">Food Explorer</h1>
-            <p className="text-sm opacity-80 mt-0.5">Discovering great food</p>
-            {avgRating && (
-              <div className="flex items-center gap-1 mt-2 bg-white bg-opacity-20 rounded-full px-3 py-1 w-fit">
-                <span className="text-amber-300">★</span>
-                <span className="text-sm font-bold">{avgRating} avg rating</span>
-              </div>
-            )}
+          <div className="flex-1 min-w-0">
+            <p className="text-xl font-extrabold leading-tight">Food Explorer</p>
+            <p className="text-sm opacity-75 mt-0.5">Discovering great food</p>
           </div>
+        </div>
+
+        {/* Inline stat strip */}
+        <div className="grid grid-cols-3 gap-2 mt-5">
+          {[
+            { label: 'Saved',   value: total },
+            { label: 'Visited', value: visited },
+            { label: 'Wishlist',value: wishlist },
+          ].map(({ label, value }) => (
+            <div
+              key={label}
+              className="rounded-2xl py-3 text-center"
+              style={{ backgroundColor: 'rgba(255,255,255,0.18)' }}
+            >
+              <p className="text-2xl font-extrabold leading-none">{value}</p>
+              <p className="text-xs font-medium opacity-80 mt-1">{label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Stats grid */}
-      <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Overview</h2>
-      <div className="grid grid-cols-2 gap-3 mb-7">
-        {STAT_CONFIG.map(({ key, icon, label, color, bg }) => (
-          <div
-            key={key}
-            className="rounded-2xl p-4 shadow-sm"
-            style={{ backgroundColor: bg, border: `1px solid ${color}20` }}
-          >
-            <span className="text-2xl">{icon}</span>
-            <p className="text-2xl font-extrabold mt-1 leading-none" style={{ color }}>
-              {statsValues[key]}
-            </p>
-            <p className="text-xs text-gray-500 font-medium mt-0.5">{label}</p>
-          </div>
-        ))}
+      {/* ── Highlights row ── */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <HighlightCard
+          icon="🍴" label="Favourite Cuisine" value={favCuisine}
+          bg="#fff7ed" color="#c2410c"
+        />
+        <HighlightCard
+          icon="⭐" label="Avg. Rating" value={avgRating ? `${avgRating}/5` : '—'}
+          bg="#fefce8" color="#a16207"
+        />
       </div>
 
-      {/* Recently added */}
-      <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Recently Added</h2>
+      {/* ── Recently added ── */}
+      <SectionLabel>Recently Added</SectionLabel>
       {recent.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-8">No restaurants yet</p>
+        <p className="text-sm text-gray-400 text-center py-10">No restaurants yet</p>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
           {recent.map((r, i) => {
             const isVisited = r.status === 'visited';
             return (
               <div
                 key={r.id}
-                className={`flex items-center gap-3 px-4 ${i !== 0 ? 'border-t border-gray-50' : ''}`}
-                style={{ minHeight: '64px' }}
+                className="flex items-center gap-3 px-4"
+                style={{
+                  minHeight: 68,
+                  borderTop: i !== 0 ? '1px solid #f3f4f6' : 'none',
+                }}
               >
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
                   style={{ backgroundColor: isVisited ? '#f0fdf4' : '#fff7ed' }}
                 >
                   {r.emoji}
                 </div>
                 <div className="flex-1 min-w-0 py-3">
-                  <p className="text-sm font-bold text-gray-900 truncate">{r.name}</p>
+                  <p className="font-semibold text-gray-900 truncate" style={{ fontSize: 15 }}>{r.name}</p>
                   <p className="text-xs text-gray-400 truncate mt-0.5">
-                    {r.location && `${r.location} · `}
-                    {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    {r.location ? `${r.location} · ` : ''}
+                    {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
                 <span
-                  className="text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0"
+                  className="shrink-0 text-xs font-semibold rounded-full px-2.5 py-1"
                   style={{
-                    backgroundColor: isVisited ? '#dcfce7' : '#fff7ed',
-                    color: isVisited ? '#16a34a' : '#ea580c',
+                    backgroundColor: isVisited ? '#dcfce7' : '#ffedd5',
+                    color: isVisited ? '#15803d' : '#c2410c',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {isVisited ? '✓ Visited' : '♡ Wishlist'}
@@ -116,5 +119,26 @@ export default function Profile() {
         </div>
       )}
     </PageWrapper>
+  );
+}
+
+function HighlightCard({ icon, label, value, bg, color }) {
+  return (
+    <div
+      className="rounded-2xl p-4"
+      style={{ backgroundColor: bg, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}
+    >
+      <span className="text-2xl">{icon}</span>
+      <p className="font-extrabold text-xl mt-2 leading-tight" style={{ color }}>
+        {value}
+      </p>
+      <p className="text-xs text-gray-500 font-medium mt-0.5">{label}</p>
+    </div>
+  );
+}
+
+function SectionLabel({ children }) {
+  return (
+    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{children}</p>
   );
 }

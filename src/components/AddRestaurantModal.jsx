@@ -8,24 +8,14 @@ const EMOJIS = [
   '☕','🧋','🍵','🥤','🍹','🫖','🍺','🍻','🥂','🍷',
 ];
 
-const DEFAULT_FORM = {
-  emoji: '🍛',
-  name: '',
-  cuisine: '',
-  location: '',
-  lat: '',
-  lng: '',
-  status: 'wishlist',
-  rating: null,
-  notes: '',
-};
+const DEFAULT = { emoji: '🍛', name: '', cuisine: '', location: '', lat: '', lng: '', status: 'wishlist', rating: null, notes: '' };
+
+const BRAND = 'linear-gradient(135deg, #ff5c28 0%, #ff7d45 100%)';
 
 export default function AddRestaurantModal({ onClose, existing }) {
   const { dispatch } = useRestaurants();
   const [form, setForm] = useState(
-    existing
-      ? { ...existing, lat: String(existing.lat ?? ''), lng: String(existing.lng ?? '') }
-      : DEFAULT_FORM
+    existing ? { ...existing, lat: String(existing.lat ?? ''), lng: String(existing.lng ?? '') } : DEFAULT
   );
   const [errors, setErrors] = useState({});
 
@@ -34,102 +24,88 @@ export default function AddRestaurantModal({ onClose, existing }) {
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  function set(field, value) {
-    setForm((f) => ({ ...f, [field]: value }));
-    setErrors((e) => ({ ...e, [field]: undefined }));
-  }
+  const set = (field, value) => {
+    setForm(f => ({ ...f, [field]: value }));
+    setErrors(e => ({ ...e, [field]: undefined }));
+  };
 
-  function validate() {
-    const errs = {};
-    if (!form.name.trim()) errs.name = 'Restaurant name is required';
-    if (form.lat && isNaN(Number(form.lat))) errs.lat = 'Must be a number';
-    if (form.lng && isNaN(Number(form.lng))) errs.lng = 'Must be a number';
-    return errs;
-  }
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = 'Name is required';
+    if (form.lat && isNaN(+form.lat)) e.lat = 'Must be a number';
+    if (form.lng && isNaN(+form.lng)) e.lng = 'Must be a number';
+    return e;
+  };
 
-  function handleSubmit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-
-    const payload = {
-      ...form,
-      name: form.name.trim(),
-      lat: form.lat ? Number(form.lat) : null,
-      lng: form.lng ? Number(form.lng) : null,
-    };
-
+    const payload = { ...form, name: form.name.trim(), lat: form.lat ? +form.lat : null, lng: form.lng ? +form.lng : null };
     if (existing) {
       dispatch({ type: 'EDIT_RESTAURANT', payload });
     } else {
-      dispatch({
-        type: 'ADD_RESTAURANT',
-        payload: { ...payload, id: crypto.randomUUID(), createdAt: new Date().toISOString() },
-      });
+      dispatch({ type: 'ADD_RESTAURANT', payload: { ...payload, id: crypto.randomUUID(), createdAt: new Date().toISOString() } });
     }
     onClose();
-  }
+  };
 
-  const inputClass = (hasError) =>
-    `w-full px-3 rounded-xl border text-base focus:outline-none focus:ring-2 focus:ring-orange-400 ${
-      hasError ? 'border-red-400' : 'border-gray-200'
-    }`;
+  const inputStyle = (err) => ({
+    height: 52, paddingLeft: 14, paddingRight: 14, fontSize: 15,
+    borderRadius: 14, border: `1.5px solid ${err ? '#f87171' : '#e5e7eb'}`,
+    width: '100%', background: '#fff', outline: 'none',
+  });
 
   return (
-    /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)' }}
+      onClick={e => e.target === e.currentTarget && onClose()}
     >
-      {/*
-        Mobile: slides up from bottom (bottom sheet)
-        Desktop: centred card
-      */}
       <div
-        className="
-          bg-white w-full overflow-y-auto shadow-2xl
-          rounded-t-3xl md:rounded-2xl
-          max-h-[92dvh] md:max-h-[90vh] md:max-w-md
-        "
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="bg-white w-full overflow-y-auto rounded-t-3xl md:rounded-2xl md:max-w-md"
+        style={{
+          maxHeight: '94dvh',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+        }}
       >
-        {/* Drag handle (mobile visual hint) */}
+        {/* Drag handle */}
         <div className="md:hidden flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+          <div className="w-10 h-1.5 rounded-full bg-gray-200" />
         </div>
 
         {/* Header */}
-        <div className="sticky top-0 bg-white px-5 pt-3 pb-4 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {existing ? 'Edit Restaurant' : 'Add Restaurant'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 text-xl leading-none"
-              aria-label="Close"
-            >
-              ×
-            </button>
-          </div>
+        <div className="sticky top-0 bg-white flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-extrabold text-gray-900">
+            {existing ? 'Edit Restaurant' : 'Add Restaurant'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 text-xl font-bold"
+            style={{ backgroundColor: '#f3f4f6' }}
+          >
+            ×
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-5 py-4 space-y-5">
+        <form onSubmit={handleSubmit} className="px-5 py-5 space-y-5">
+
           {/* Emoji picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
-            {/* 8 cols on mobile, 10 on desktop */}
-            <div className="grid grid-cols-8 md:grid-cols-10 gap-1 p-2 bg-gray-50 rounded-xl max-h-36 overflow-y-auto">
-              {EMOJIS.map((em) => (
+            <Label>Icon</Label>
+            <div className="grid grid-cols-8 gap-1.5 p-3 bg-gray-50 rounded-2xl max-h-40 overflow-y-auto">
+              {EMOJIS.map(em => (
                 <button
-                  type="button"
-                  key={em}
+                  type="button" key={em}
                   onClick={() => set('emoji', em)}
-                  className={`flex items-center justify-center rounded-xl transition-colors ${
-                    form.emoji === em ? 'bg-orange-100 ring-2 ring-orange-400' : 'hover:bg-gray-200 active:bg-gray-300'
-                  }`}
-                  style={{ fontSize: '22px', aspectRatio: '1', minHeight: '40px' }}
+                  className="flex items-center justify-center rounded-xl transition-all"
+                  style={{
+                    fontSize: 24, aspectRatio: '1', minHeight: 44,
+                    backgroundColor: form.emoji === em ? '#fff2ee' : 'transparent',
+                    outline: form.emoji === em ? '2px solid #ff5c28' : 'none',
+                    outlineOffset: -2,
+                  }}
                 >
                   {em}
                 </button>
@@ -139,110 +115,87 @@ export default function AddRestaurantModal({ onClose, existing }) {
 
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Restaurant Name <span className="text-red-500">*</span>
-            </label>
+            <Label required>Restaurant Name</Label>
             <input
-              type="text"
-              value={form.name}
-              onChange={(e) => set('name', e.target.value)}
+              type="text" value={form.name}
+              onChange={e => set('name', e.target.value)}
               placeholder="e.g. Paragon Restaurant"
-              className={inputClass(errors.name)}
-              style={{ height: '48px' }}
-              autoComplete="off"
+              style={inputStyle(errors.name)} autoComplete="off"
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name}</p>}
           </div>
 
           {/* Cuisine */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Cuisine Type</label>
+            <Label>Cuisine Type</Label>
             <input
-              type="text"
-              value={form.cuisine}
-              onChange={(e) => set('cuisine', e.target.value)}
-              placeholder="e.g. Kerala, Seafood, Italian"
-              className={inputClass(false)}
-              style={{ height: '48px' }}
-              autoComplete="off"
+              type="text" value={form.cuisine}
+              onChange={e => set('cuisine', e.target.value)}
+              placeholder="Kerala, Seafood, Italian…"
+              style={inputStyle(false)} autoComplete="off"
             />
           </div>
 
           {/* Location */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
+            <Label>Location</Label>
             <input
-              type="text"
-              value={form.location}
-              onChange={(e) => set('location', e.target.value)}
-              placeholder="e.g. Kozhikode, Kerala"
-              className={inputClass(false)}
-              style={{ height: '48px' }}
-              autoComplete="off"
+              type="text" value={form.location}
+              onChange={e => set('location', e.target.value)}
+              placeholder="Kozhikode, Kerala"
+              style={inputStyle(false)} autoComplete="off"
             />
           </div>
 
           {/* Lat / Lng */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Latitude</label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={form.lat}
-                onChange={(e) => set('lat', e.target.value)}
-                placeholder="11.2588"
-                className={inputClass(errors.lat)}
-                style={{ height: '48px' }}
-              />
+              <Label>Latitude</Label>
+              <input type="text" inputMode="decimal" value={form.lat}
+                onChange={e => set('lat', e.target.value)}
+                placeholder="11.2588" style={inputStyle(errors.lat)} />
               {errors.lat && <p className="text-red-500 text-xs mt-1">{errors.lat}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Longitude</label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={form.lng}
-                onChange={(e) => set('lng', e.target.value)}
-                placeholder="75.7804"
-                className={inputClass(errors.lng)}
-                style={{ height: '48px' }}
-              />
+              <Label>Longitude</Label>
+              <input type="text" inputMode="decimal" value={form.lng}
+                onChange={e => set('lng', e.target.value)}
+                placeholder="75.7804" style={inputStyle(errors.lng)} />
               {errors.lng && <p className="text-red-500 text-xs mt-1">{errors.lng}</p>}
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
+            <Label>Notes</Label>
             <textarea
               value={form.notes}
-              onChange={(e) => set('notes', e.target.value)}
+              onChange={e => set('notes', e.target.value)}
               placeholder="Any notes about this place…"
               rows={2}
-              className="w-full px-3 py-3 rounded-xl border border-gray-200 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
+              style={{ ...inputStyle(false), height: 'auto', paddingTop: 14, paddingBottom: 14, resize: 'none' }}
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <Label>Status</Label>
             <div className="flex gap-3">
-              {['wishlist', 'visited'].map((s) => (
+              {[
+                { val: 'wishlist', label: '❤️ Want to Visit',   border: '#ff5c28', bg: '#fff7ed', clr: '#c2410c' },
+                { val: 'visited',  label: '✅ Already Visited', border: '#22c55e', bg: '#f0fdf4', clr: '#15803d' },
+              ].map(({ val, label, border, bg, clr }) => (
                 <button
-                  key={s}
-                  type="button"
-                  onClick={() => set('status', s)}
-                  className={`flex-1 rounded-xl text-sm font-medium border-2 transition-colors ${
-                    form.status === s
-                      ? s === 'visited'
-                        ? 'border-green-500 bg-green-50 text-green-700'
-                        : 'border-orange-500 bg-orange-50 text-orange-700'
-                      : 'border-gray-200 text-gray-500'
-                  }`}
-                  style={{ minHeight: '48px' }}
+                  key={val} type="button" onClick={() => set('status', val)}
+                  className="flex-1 text-sm font-semibold rounded-2xl transition-all"
+                  style={{
+                    minHeight: 52,
+                    border: `2px solid ${form.status === val ? border : '#e5e7eb'}`,
+                    backgroundColor: form.status === val ? bg : '#fafafa',
+                    color: form.status === val ? clr : '#9ca3af',
+                  }}
                 >
-                  {s === 'wishlist' ? '❤️ Want to Visit' : '✅ Already Visited'}
+                  {label}
                 </button>
               ))}
             </div>
@@ -251,17 +204,16 @@ export default function AddRestaurantModal({ onClose, existing }) {
           {/* Actions */}
           <div className="flex gap-3 pt-1 pb-2">
             <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-              style={{ minHeight: '50px' }}
+              type="button" onClick={onClose}
+              className="flex-1 text-sm font-semibold text-gray-600 rounded-2xl"
+              style={{ minHeight: 54, border: '1.5px solid #e5e7eb', backgroundColor: '#fafafa' }}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 rounded-xl text-sm font-semibold text-white transition-colors"
-              style={{ backgroundColor: '#ff5c28', minHeight: '50px' }}
+              className="flex-1 text-sm font-bold text-white rounded-2xl"
+              style={{ minHeight: 54, background: BRAND, boxShadow: '0 4px 14px rgba(255,92,40,0.4)' }}
             >
               {existing ? 'Save Changes' : 'Add Restaurant'}
             </button>
@@ -269,5 +221,13 @@ export default function AddRestaurantModal({ onClose, existing }) {
         </form>
       </div>
     </div>
+  );
+}
+
+function Label({ children, required }) {
+  return (
+    <label className="block text-sm font-semibold text-gray-700 mb-2">
+      {children}{required && <span className="text-red-400 ml-0.5">*</span>}
+    </label>
   );
 }

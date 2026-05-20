@@ -1,8 +1,12 @@
-export default function PageWrapper({ children, className = '' }) {
+/**
+ * Mobile-first page container.
+ * Horizontal padding: 16px. Bottom clearance: 80px (bottom nav) + safe area.
+ */
+export default function PageWrapper({ children }) {
   return (
     <div
-      className={`p-4 md:p-6 max-w-2xl w-full ${className}`}
-      style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}
+      className="w-full max-w-2xl px-4 pt-5"
+      style={{ paddingBottom: 'calc(88px + env(safe-area-inset-bottom))' }}
     >
       {children}
     </div>
