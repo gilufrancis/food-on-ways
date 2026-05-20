@@ -11,13 +11,13 @@ export default function App() {
   return (
     <RestaurantProvider>
       <BrowserRouter>
-        <div className="flex min-h-screen" style={{ backgroundColor: '#f8f9fb' }}>
+        {/*
+          Mobile  → flex-col: Navbar (header 56px) stacks ABOVE main content
+          Desktop → md:flex-row: sidebar sits BESIDE main content
+        */}
+        <div className="flex flex-col md:flex-row min-h-screen" style={{ backgroundColor: '#f8f9fb' }}>
           <Navbar />
-
-          {/* Main content area.
-              On mobile: top bar is sticky so no top offset needed.
-              Bottom nav is fixed — pages add their own bottom clearance via pb-safe. */}
-          <main className="flex-1 min-w-0 flex flex-col min-h-0">
+          <main className="flex-1 min-w-0">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/map" element={<Map />} />
