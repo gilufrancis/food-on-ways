@@ -4,12 +4,14 @@ import RestaurantCard from '../components/RestaurantCard';
 import SearchBar from '../components/SearchBar';
 import PageWrapper from '../components/PageWrapper';
 
-const FILTERS = ['all', 'wishlist', 'visited'];
-
 export default function Home() {
   const { restaurants } = useRestaurants();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
+
+  const total = restaurants.length;
+  const visitedCount = restaurants.filter((r) => r.status === 'visited').length;
+  const wishlistCount = restaurants.filter((r) => r.status === 'wishlist').length;
 
   const filtered = restaurants.filter((r) => {
     const matchesFilter = filter === 'all' || r.status === filter;
@@ -22,49 +24,69 @@ export default function Home() {
     return matchesFilter && matchesQuery;
   });
 
+  const FILTERS = [
+    { key: 'all', label: 'All', count: total },
+    { key: 'wishlist', label: 'Wishlist', count: wishlistCount },
+    { key: 'visited', label: 'Visited', count: visitedCount },
+  ];
+
   return (
     <PageWrapper>
-      <div className="mb-5">
-        <h1 className="text-2xl font-bold text-gray-900 mb-0.5">My Restaurants</h1>
-        <p className="text-sm text-gray-500">{restaurants.length} places saved</p>
+      {/* Stats banner */}
+      <div
+        className="rounded-2xl p-5 mb-5 text-white"
+        style={{ background: 'linear-gradient(135deg, #ff5c28 0%, #ff8c42 100%)' }}
+      >
+        <p className="text-sm font-medium opacity-80 mb-0.5">Good taste, great places</p>
+        <h1 className="text-2xl font-extrabold tracking-tight">My Restaurants</h1>
+        <div className="flex gap-4 mt-4">
+          <StatChip label="Saved" value={total} />
+          <div className="w-px bg-white opacity-20" />
+          <StatChip label="Visited" value={visitedCount} />
+          <div className="w-px bg-white opacity-20" />
+          <StatChip label="Wishlist" value={wishlistCount} />
+        </div>
       </div>
 
+      {/* Search */}
       <div className="mb-4">
         <SearchBar value={query} onChange={setQuery} />
       </div>
 
-      {/* Filter tabs — scrollable if they overflow on tiny screens */}
-      <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`shrink-0 px-4 rounded-full text-sm font-medium transition-colors ${
-              filter === f
-                ? 'text-white'
-                : 'bg-gray-100 text-gray-600 active:bg-gray-200'
-            }`}
-            style={{
-              minHeight: '36px',
-              ...(filter === f && { backgroundColor: '#ff5c28' }),
-            }}
-          >
-            {f === 'all' ? 'All' : f === 'wishlist' ? 'Wishlist' : 'Visited'}
-            <span className="ml-1.5 text-xs opacity-70">
-              {f === 'all'
-                ? restaurants.length
-                : restaurants.filter((r) => r.status === f).length}
-            </span>
-          </button>
-        ))}
+      {/* Filter tabs */}
+      <div className="flex gap-2 mb-5 overflow-x-auto pb-0.5 scrollbar-none">
+        {FILTERS.map(({ key, label, count }) => {
+          const active = filter === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className="shrink-0 flex items-center gap-1.5 px-4 rounded-full text-sm font-semibold transition-all"
+              style={{
+                minHeight: '36px',
+                backgroundColor: active ? '#ff5c28' : '#f3f4f6',
+                color: active ? '#fff' : '#6b7280',
+                boxShadow: active ? '0 2px 8px rgba(255,92,40,0.3)' : 'none',
+              }}
+            >
+              {label}
+              <span
+                className="text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+                style={{
+                  backgroundColor: active ? 'rgba(255,255,255,0.25)' : '#e5e7eb',
+                  color: active ? '#fff' : '#9ca3af',
+                }}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
+      {/* Card list */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-5xl mb-4">🍽️</div>
-          <p className="text-gray-500 font-medium">No restaurants found</p>
-          <p className="text-gray-400 text-sm mt-1">Try a different search or filter</p>
-        </div>
+        <EmptyState query={query} filter={filter} />
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((r) => (
@@ -73,5 +95,30 @@ export default function Home() {
         </div>
       )}
     </PageWrapper>
+  );
+}
+
+function StatChip({ label, value }) {
+  return (
+    <div className="text-center">
+      <p className="text-2xl font-extrabold leading-none">{value}</p>
+      <p className="text-xs opacity-75 mt-0.5">{label}</p>
+    </div>
+  );
+}
+
+function EmptyState({ query, filter }) {
+  return (
+    <div className="text-center py-16 px-4">
+      <div className="text-6xl mb-4">{query ? '🔍' : '🍽️'}</div>
+      <p className="text-gray-700 font-semibold text-lg">
+        {query ? 'No results found' : filter !== 'all' ? `No ${filter} restaurants yet` : 'No restaurants yet'}
+      </p>
+      <p className="text-gray-400 text-sm mt-1.5 max-w-xs mx-auto">
+        {query
+          ? `Nothing matched "${query}". Try a different search.`
+          : 'Tap + Add to save your first restaurant.'}
+      </p>
+    </div>
   );
 }

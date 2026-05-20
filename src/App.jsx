@@ -11,7 +11,7 @@ export default function App() {
   return (
     <RestaurantProvider>
       <BrowserRouter>
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen" style={{ backgroundColor: '#f8f9fb' }}>
           <Navbar />
 
           {/* Main content area.
