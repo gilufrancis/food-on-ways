@@ -1,20 +1,32 @@
+import { useNavigate } from 'react-router-dom';
 import { useRestaurants } from '../context/RestaurantContext';
 import PageWrapper from '../components/PageWrapper';
 
-const BRAND = 'linear-gradient(135deg, #ff5c28 0%, #ff7d45 100%)';
+const SETTINGS = [
+  { icon: '🔔', label: 'Notifications' },
+  { icon: '📍', label: 'Location' },
+  { icon: '🎨', label: 'Appearance' },
+  { icon: '📤', label: 'Export my data' },
+  { icon: '❓', label: 'Help & feedback' },
+];
 
 export default function Profile() {
   const { restaurants } = useRestaurants();
+  const navigate = useNavigate();
 
   const total    = restaurants.length;
   const visited  = restaurants.filter(r => r.status === 'visited').length;
   const wishlist = restaurants.filter(r => r.status === 'wishlist').length;
+  const cities   = new Set(restaurants.map(r => r.location?.split(',')[1]?.trim() || r.location?.split(',')[0]?.trim()).filter(Boolean)).size;
 
-  const cuisineCounts = {};
+  const cuisineMap = {};
   restaurants.forEach(r => {
-    if (r.cuisine) cuisineCounts[r.cuisine] = (cuisineCounts[r.cuisine] || 0) + 1;
+    (r.cuisine || '').split('·').forEach(c => {
+      const k = c.trim();
+      if (k) cuisineMap[k] = (cuisineMap[k] || 0) + 1;
+    });
   });
-  const favCuisine = Object.entries(cuisineCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+  const favCuisine = Object.entries(cuisineMap).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
 
   const rated = restaurants.filter(r => r.status === 'visited' && r.rating);
   const avgRating = rated.length
@@ -23,99 +35,98 @@ export default function Profile() {
 
   const recent = [...restaurants]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 6);
+    .slice(0, 5);
 
   return (
     <PageWrapper>
       {/* ── Full-bleed hero ── */}
-      <div className="text-white" style={{ background: BRAND }}>
-        <div className="px-4 pt-6 pb-7">
-          <div className="flex items-center gap-4 mb-5">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0"
-              style={{ backgroundColor: 'rgba(255,255,255,0.22)' }}
-            >
+      <div style={{ backgroundColor: 'var(--surface-3)', borderBottom: '1px solid var(--line)' }}>
+        <div className="px-4 pt-8 pb-6">
+          <div className="flex items-center gap-4">
+            <div style={{
+              width: 64, height: 64, borderRadius: 'var(--r-xl)', flexShrink: 0,
+              backgroundColor: 'var(--orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28,
+            }}>
               🍽️
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xl font-extrabold leading-tight">Food Explorer</p>
-              <p className="text-sm opacity-75 mt-0.5">Discovering great food</p>
+            <div>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+                Food Explorer
+              </p>
+              <p style={{ fontSize: 13, color: 'var(--ink-3)', marginTop: 2, fontStyle: 'italic' }}>
+                Discovering great food across Kerala
+              </p>
             </div>
-          </div>
-
-          {/* Stat strip */}
-          <div className="grid grid-cols-3 gap-2.5">
-            {[
-              { label: 'Saved',    value: total },
-              { label: 'Visited',  value: visited },
-              { label: 'Wishlist', value: wishlist },
-            ].map(({ label, value }) => (
-              <div
-                key={label}
-                className="rounded-2xl py-3 text-center"
-                style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}
-              >
-                <p className="text-2xl font-extrabold leading-none">{value}</p>
-                <p className="text-xs font-semibold mt-1" style={{ opacity: 0.8 }}>{label}</p>
-              </div>
-            ))}
           </div>
         </div>
       </div>
 
-      {/* ── Highlights row ── */}
-      <div className="px-4 pt-4 pb-1">
-        <div className="grid grid-cols-2 gap-3">
-          <HighlightCard
-            icon="🍴" label="Favourite Cuisine" value={favCuisine}
-            bg="#fff7ed" color="#c2410c"
-          />
-          <HighlightCard
-            icon="⭐" label="Avg. Rating" value={avgRating ? `${avgRating}/5` : '—'}
-            bg="#fefce8" color="#a16207"
-          />
+      {/* ── 4-up stat cards ── */}
+      <div className="grid grid-cols-4 gap-2 px-4 pt-5">
+        {[
+          { label: 'Saved',   value: total,    color: 'var(--orange)' },
+          { label: 'Visited', value: visited,  color: 'var(--green)' },
+          { label: 'Wishlist',value: wishlist, color: 'var(--coral)' },
+          { label: 'Cities',  value: cities,   color: 'var(--amber)' },
+        ].map(({ label, value, color }) => (
+          <div key={label} style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--r-md)', padding: '12px 6px', textAlign: 'center', boxShadow: 'var(--shadow-sm)' }}>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color, letterSpacing: '-0.02em' }}>{value}</p>
+            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--ink-3)', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em', lineHeight: 1.2 }}>{label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Highlights ── */}
+      <div className="grid grid-cols-2 gap-3 px-4 pt-4">
+        <HighlightCard icon="🍴" label="Fav cuisine" value={favCuisine} bg="var(--orange-soft)" color="var(--orange-deep)" />
+        <HighlightCard icon="⭐" label="Avg rating" value={avgRating ? `${avgRating}/5` : '—'} bg="var(--amber-soft)" color="#a16207" />
+      </div>
+
+      {/* ── Become a creator CTA ── */}
+      <div className="px-4 pt-5">
+        <div
+          className="rounded-2xl p-4 flex items-center gap-3"
+          style={{ backgroundColor: 'var(--amber-soft)', border: '1px solid var(--amber)', boxShadow: 'var(--shadow-sm)' }}
+        >
+          <span style={{ fontSize: 28, flexShrink: 0 }}>🎬</span>
+          <div>
+            <p className="t-caps mb-0.5" style={{ color: '#6E4A0F' }}>Food creator?</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
+              Share your picks <em style={{ color: '#a16207' }}>with the community</em>
+            </p>
+          </div>
         </div>
       </div>
 
       {/* ── Recently added ── */}
-      <div className="px-4 pt-4">
-        <SectionLabel>Recently Added</SectionLabel>
+      <div className="px-4 pt-5">
+        <p className="t-caps mb-3" style={{ color: 'var(--ink-3)' }}>Recently added</p>
         {recent.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-10">No restaurants yet</p>
+          <p style={{ fontSize: 13, color: 'var(--ink-3)', textAlign: 'center', paddingTop: 32 }}>No restaurants yet</p>
         ) : (
-          <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.07)' }}>
+          <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--r-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
             {recent.map((r, i) => {
               const isVisited = r.status === 'visited';
               return (
                 <div
                   key={r.id}
                   className="flex items-center gap-3 px-4"
-                  style={{
-                    minHeight: 68,
-                    borderTop: i !== 0 ? '1px solid #f3f4f6' : 'none',
-                  }}
+                  style={{ minHeight: 64, borderTop: i !== 0 ? '1px solid var(--line)' : 'none' }}
                 >
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
-                    style={{ backgroundColor: isVisited ? '#f0fdf4' : '#fff7ed' }}
-                  >
+                  <div style={{ width: 40, height: 40, borderRadius: 'var(--r-md)', flexShrink: 0, backgroundColor: isVisited ? 'var(--green-soft)' : 'var(--orange-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
                     {r.emoji}
                   </div>
                   <div className="flex-1 min-w-0 py-3">
-                    <p className="font-semibold text-gray-900 truncate" style={{ fontSize: 15 }}>{r.name}</p>
-                    <p className="text-xs text-gray-400 truncate mt-0.5">
-                      {r.location ? `${r.location} · ` : ''}
-                      {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--ink)' }} className="truncate">{r.name}</p>
+                    <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 2 }} className="truncate">
+                      {r.location?.split(',')[0]} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                     </p>
                   </div>
-                  <span
-                    className="shrink-0 text-xs font-semibold rounded-full px-2.5 py-1"
-                    style={{
-                      backgroundColor: isVisited ? '#dcfce7' : '#ffedd5',
-                      color: isVisited ? '#15803d' : '#c2410c',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 'var(--r-pill)', flexShrink: 0,
+                    backgroundColor: isVisited ? 'var(--green-soft)' : 'var(--coral-soft)',
+                    color: isVisited ? 'var(--green)' : 'var(--coral)',
+                  }}>
                     {isVisited ? '✓ Visited' : '♡ Wishlist'}
                   </span>
                 </div>
@@ -124,27 +135,34 @@ export default function Profile() {
           </div>
         )}
       </div>
+
+      {/* ── Settings ── */}
+      <div className="px-4 pt-6 pb-2">
+        <p className="t-caps mb-3" style={{ color: 'var(--ink-3)' }}>Settings</p>
+        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--r-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+          {SETTINGS.map((s, i) => (
+            <button
+              key={s.label}
+              className="flex items-center gap-3 w-full text-left px-4"
+              style={{ minHeight: 52, borderTop: i !== 0 ? '1px solid var(--line)' : 'none', background: 'none' }}
+            >
+              <span style={{ fontSize: 18, flexShrink: 0 }}>{s.icon}</span>
+              <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'var(--ink)' }}>{s.label}</span>
+              <span style={{ fontSize: 16, color: 'var(--ink-4)' }}>›</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </PageWrapper>
   );
 }
 
 function HighlightCard({ icon, label, value, bg, color }) {
   return (
-    <div
-      className="rounded-2xl p-4"
-      style={{ backgroundColor: bg, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}
-    >
-      <span className="text-2xl">{icon}</span>
-      <p className="font-extrabold text-xl mt-2 leading-tight" style={{ color }}>
-        {value}
-      </p>
-      <p className="text-xs text-gray-500 font-medium mt-0.5">{label}</p>
+    <div style={{ backgroundColor: bg, borderRadius: 'var(--r-lg)', padding: 16, boxShadow: 'var(--shadow-sm)', border: '1px solid var(--line)' }}>
+      <span style={{ fontSize: 24 }}>{icon}</span>
+      <p style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, marginTop: 8, color, letterSpacing: '-0.01em', lineHeight: 1.1 }}>{value}</p>
+      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-3)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
     </div>
-  );
-}
-
-function SectionLabel({ children }) {
-  return (
-    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{children}</p>
   );
 }

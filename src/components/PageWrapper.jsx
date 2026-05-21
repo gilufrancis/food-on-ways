@@ -7,7 +7,11 @@ export default function PageWrapper({ children }) {
   return (
     <div
       className="w-full max-w-2xl"
-      style={{ paddingBottom: 'calc(90px + env(safe-area-inset-bottom))' }}
+      style={{
+        paddingBottom: 'calc(80px + env(safe-area-inset-bottom))',
+        backgroundColor: 'var(--surface)',
+        minHeight: '100dvh',
+      }}
     >
       {children}
     </div>

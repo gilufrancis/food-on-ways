@@ -23,8 +23,9 @@ function reducer(state, action) {
       return next;
     }
     case 'TOGGLE_STATUS': {
+      const id = typeof action.payload === 'object' ? action.payload.id : action.payload;
       const next = state.map((r) =>
-        r.id === action.payload
+        r.id === id
           ? { ...r, status: r.status === 'wishlist' ? 'visited' : 'wishlist' }
           : r
       );

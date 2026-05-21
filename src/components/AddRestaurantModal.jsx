@@ -10,7 +10,7 @@ const EMOJIS = [
 
 const DEFAULT = { emoji: '🍛', name: '', cuisine: '', location: '', lat: '', lng: '', status: 'wishlist', rating: null, notes: '' };
 
-const BRAND = 'linear-gradient(135deg, #ff5c28 0%, #ff7d45 100%)';
+const BRAND = 'var(--orange)';
 
 export default function AddRestaurantModal({ onClose, existing }) {
   const { dispatch } = useRestaurants();
@@ -52,14 +52,17 @@ export default function AddRestaurantModal({ onClose, existing }) {
 
   const inputStyle = (err) => ({
     height: 52, paddingLeft: 14, paddingRight: 14, fontSize: 15,
-    borderRadius: 14, border: `1.5px solid ${err ? '#f87171' : '#e5e7eb'}`,
-    width: '100%', background: '#fff', outline: 'none',
+    borderRadius: 'var(--r-md)',
+    border: `1.5px solid ${err ? 'var(--coral)' : 'var(--line)'}`,
+    width: '100%', background: 'var(--surface)', outline: 'none',
+    color: 'var(--ink)',
+    fontFamily: 'var(--font-ui)',
   });
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)' }}
+      style={{ backgroundColor: 'rgba(26,21,18,0.55)', backdropFilter: 'blur(4px)' }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
@@ -67,7 +70,7 @@ export default function AddRestaurantModal({ onClose, existing }) {
         style={{
           maxHeight: '94dvh',
           paddingBottom: 'env(safe-area-inset-bottom)',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         {/* Drag handle */}
