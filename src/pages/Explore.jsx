@@ -5,12 +5,12 @@ import { posts } from '../data/posts';
 import { events } from '../data/events';
 import { creators, getCreator } from '../data/creators';
 import CreatorPostCard from '../components/CreatorPostCard';
-import SectionHead from '../components/SectionHead';
-import Pill from '../components/Pill';
 import Avatar from '../components/Avatar';
+import Pill from '../components/Pill';
 import PageWrapper from '../components/PageWrapper';
 
-const HERO_IMAGES = {
+/* ─── Image map ─── */
+const IMG = {
   paragon:    'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=900&q=80',
   sagar:      'https://images.unsplash.com/photo-1611599537845-1c7aca0091c0?w=900&q=80',
   kayees:     'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=900&q=80',
@@ -23,166 +23,220 @@ const HERO_IMAGES = {
 
 const TRENDING_IDS = ['paragon', 'kayees', 'moplah', 'appammachi', 'topform'];
 
+function detectCity(restaurants) {
+  const cities = restaurants
+    .map(r => r.location?.split(',')[1]?.trim() || r.location?.split(',')[0]?.trim())
+    .filter(Boolean);
+  if (!cities.length) return 'Kozhikode';
+  const freq = {};
+  cities.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
+  return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
+}
+
 export default function Explore() {
   const { restaurants, dispatch } = useRestaurants();
   const navigate = useNavigate();
   const [query, setQuery]   = useState('');
   const [filter, setFilter] = useState('all');
 
-  const total         = restaurants.length;
-  const visitedCount  = restaurants.filter(r => r.status === 'visited').length;
   const wishlistCount = restaurants.filter(r => r.status === 'wishlist').length;
+  const visitedCount  = restaurants.filter(r => r.status === 'visited').length;
+  const total         = restaurants.length;
+  const city = detectCity(restaurants);
 
   const hero = [...restaurants].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
   const trending = TRENDING_IDS.map(id => restaurants.find(r => r.id === id)).filter(Boolean);
-  const handleToggle = (id) => dispatch({ type: 'TOGGLE_STATUS', payload: { id } });
+  const handleToggle = id => dispatch({ type: 'TOGGLE_STATUS', payload: { id } });
 
   return (
     <PageWrapper>
 
-      {/* ── Location bar ── */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <Pill variant="outline" style={{ fontSize: 13, gap: 6 }}>
-          <span style={{ color: 'var(--orange)' }}>📍</span> Kerala
-        </Pill>
-        <p style={{ fontSize: 13, color: 'var(--ink-3)', fontWeight: 500 }}>
+      {/* ─── Location bar ─── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px var(--px) 14px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Pill variant="outline" style={{ fontSize: 13, fontWeight: 600, gap: 5 }}>
+            <span style={{ color: 'var(--orange)' }}>📍</span>
+            {city}
+          </Pill>
+          <span style={{ fontSize: 13, color: 'var(--ink-3)' }}>· Switch city</span>
+        </div>
+        {/* Right count — leave space for FAB */}
+        <p style={{ fontSize: 13, color: 'var(--ink-3)', paddingRight: 68 }}>
           <span style={{ color: 'var(--orange)', fontWeight: 700 }}>{wishlistCount}</span> wishlisted
         </p>
       </div>
 
-      {/* ── Section heading ── */}
-      <div className="px-4 pb-5">
-        <p className="t-caps mb-2" style={{ color: 'var(--ink-3)' }}>Your next great meal</p>
+      {/* ─── Section heading ─── */}
+      <div style={{ padding: '0 var(--px) 20px' }}>
+        <p className="t-caps" style={{ color: 'var(--orange)', marginBottom: 6 }}>
+          Your next great meal
+        </p>
         <h1 style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 30, fontWeight: 500,
+          fontSize: 32, fontWeight: 600,
           color: 'var(--ink)',
-          letterSpacing: '-0.03em',
+          letterSpacing: '-0.035em',
           lineHeight: 1.05,
         }}>
-          Crab, biryani,{' '}
-          <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>sunset.</em>
+          Crab, biryani, <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>sunset.</em>
         </h1>
       </div>
 
-      {/* ── Hero card ── */}
+      {/* ─── Hero card ─── */}
       {hero && (
-        <div className="px-4 pb-6">
+        <div style={{ padding: '0 var(--px-card) 24px' }}>
           <HeroCard
             restaurant={hero}
-            image={HERO_IMAGES[hero.id]}
+            image={IMG[hero.id]}
             onToggle={() => handleToggle(hero.id)}
             creatorPreviews={creators.slice(0, 3)}
           />
         </div>
       )}
 
-      {/* ── Trending near you ── */}
-      <div className="pb-6">
-        <div className="px-4 mb-3">
-          <SectionHead
-            kicker="Trending near you 🔥"
-            title={<>What's getting <em style={{ color: 'var(--orange)' }}>saved</em></>}
-            action="Map"
-            onAction={() => navigate('/map')}
-          />
+      {/* ─── Trending near you ─── */}
+      <section style={{ marginBottom: 28 }}>
+        {/* Section head */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '0 var(--px) 14px' }}>
+          <div>
+            <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 4 }}>Trending near you 🔥</p>
+            <h2 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 22, fontWeight: 600,
+              color: 'var(--ink)', letterSpacing: '-0.025em', lineHeight: 1.1,
+            }}>
+              What's getting <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>saved</em>
+            </h2>
+          </div>
+          <button
+            onClick={() => navigate('/map')}
+            className="t-caps"
+            style={{ color: 'var(--orange)', border: 'none', background: 'none', paddingBottom: 2 }}
+          >
+            Map →
+          </button>
         </div>
-        {trending.length > 0 ? (
-          <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-2" style={{ scrollSnapType: 'x mandatory' }}>
-            {trending.map((r, i) => (
-              <TrendingCard
-                key={r.id}
-                restaurant={r}
-                image={HERO_IMAGES[r.id]}
-                index={i}
-                onToggle={() => handleToggle(r.id)}
-              />
-            ))}
-            <button
-              onClick={() => navigate('/map')}
-              className="shrink-0 flex flex-col items-center justify-center gap-2 overflow-hidden"
-              style={{
-                width: 120, minHeight: 175,
-                background: 'var(--ink)', color: '#fff', border: 'none',
-                boxShadow: 'var(--shadow-md)',
-                borderRadius: 'var(--r-lg)',
-                scrollSnapAlign: 'start',
-                position: 'relative',
-              }}
-            >
-              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 60% 40%, rgba(245,98,45,0.35), transparent 55%)' }} />
-              <span style={{ fontSize: 30, position: 'relative', zIndex: 1 }}>🗺️</span>
-              <span style={{ fontSize: 11, fontWeight: 600, textAlign: 'center', lineHeight: 1.4, padding: '0 10px', position: 'relative', zIndex: 1 }}>
-                See all<br />on map →
-              </span>
-            </button>
-          </div>
-        ) : (
-          <div className="px-4">
-            <p style={{ fontSize: 13, color: 'var(--ink-3)', paddingTop: 8 }}>
-              Add restaurants to see them here.
-            </p>
-          </div>
-        )}
-      </div>
 
-      {/* ── Fresh from creators ── */}
-      <div className="pb-6">
-        <div className="px-4 mb-4">
-          <SectionHead
-            kicker="🎬 Fresh from creators"
-            title={<>YouTuber <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>picks</em></>}
-          />
+        {/* Horizontal scroll cards */}
+        <div
+          className="no-scrollbar"
+          style={{
+            display: 'flex', gap: 12,
+            overflowX: 'auto',
+            padding: '0 var(--px) 4px',
+            scrollSnapType: 'x mandatory',
+          }}
+        >
+          {trending.length > 0 ? trending.map((r, i) => (
+            <TrendingCard
+              key={r.id}
+              restaurant={r}
+              image={IMG[r.id]}
+              index={i}
+              onToggle={() => handleToggle(r.id)}
+            />
+          )) : (
+            <p style={{ fontSize: 13, color: 'var(--ink-3)' }}>Add restaurants to see them here.</p>
+          )}
+
+          {/* "See all on map" card */}
+          <button
+            onClick={() => navigate('/map')}
+            style={{
+              width: 130, flexShrink: 0, borderRadius: 'var(--r-lg)',
+              background: 'var(--ink)', color: '#fff',
+              border: 'none', cursor: 'pointer',
+              position: 'relative', overflow: 'hidden',
+              scrollSnapAlign: 'start',
+            }}
+          >
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'radial-gradient(circle at 60% 35%, rgba(245,98,45,0.38), transparent 55%)',
+            }} />
+            <div style={{ padding: '0 0 16px', position: 'relative', zIndex: 1 }}>
+              <div style={{ height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
+                🗺️
+              </div>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, textAlign: 'center', lineHeight: 1.3, padding: '0 12px' }}>
+                See all<br />on map →
+              </p>
+            </div>
+          </button>
         </div>
-        <div className="flex flex-col gap-5 px-4">
+      </section>
+
+      {/* ─── Fresh from creators ─── */}
+      <section style={{ marginBottom: 28 }}>
+        <div style={{ padding: '0 var(--px) 16px' }}>
+          <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 4 }}>🎬 Fresh from creators</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22, fontWeight: 600,
+            color: 'var(--ink)', letterSpacing: '-0.025em', lineHeight: 1.1,
+          }}>
+            YouTuber <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>picks</em>
+          </h2>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '0 var(--px)' }}>
           {posts.map((post, i) => (
             <CreatorPostCard key={post.id} post={post} index={i} />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ── Happening soon ── */}
-      <div className="pb-6">
-        <div className="px-4 mb-3">
-          <SectionHead
-            kicker="📅 Happening soon"
-            title={<>Eat with <em style={{ color: 'var(--amber)', fontStyle: 'italic' }}>others</em></>}
-          />
+      {/* ─── Happening soon ─── */}
+      <section style={{ marginBottom: 28 }}>
+        <div style={{ padding: '0 var(--px) 14px' }}>
+          <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 4 }}>📅 Happening soon</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22, fontWeight: 600,
+            color: 'var(--ink)', letterSpacing: '-0.025em', lineHeight: 1.1,
+          }}>
+            Eat with <em style={{ color: 'var(--amber)', fontStyle: 'italic' }}>others</em>
+          </h2>
         </div>
-        <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-2">
-          {events.map(ev => (
-            <EventCard key={ev.id} event={ev} />
-          ))}
+        <div
+          className="no-scrollbar"
+          style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 var(--px) 4px' }}
+        >
+          {events.map(ev => <EventCard key={ev.id} event={ev} />)}
         </div>
-      </div>
+      </section>
 
-      {/* ── Wishlist nudge ── */}
+      {/* ─── Wishlist nudge ─── */}
       {wishlistCount >= 1 && (
-        <div className="px-4 pb-6">
+        <div style={{ padding: '0 var(--px)', marginBottom: 24 }}>
           <button
             onClick={() => navigate('/wishlist')}
-            className="w-full text-left rounded-2xl p-4"
             style={{
+              width: '100%', textAlign: 'left',
               background: 'linear-gradient(135deg, var(--orange-soft) 0%, var(--coral-soft) 100%)',
               border: '1px solid var(--line)',
-              boxShadow: 'var(--shadow-sm)',
               borderRadius: 'var(--r-lg)',
+              padding: '16px 18px',
+              cursor: 'pointer',
             }}
           >
-            <div className="flex items-center gap-3 mb-3">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
-                width: 38, height: 38, borderRadius: '50%',
-                background: 'var(--orange)', color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18, flexShrink: 0,
+                width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+                backgroundColor: 'var(--orange)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17,
               }}>
                 ♥
               </div>
               <div>
-                <p className="t-caps mb-0.5" style={{ color: 'var(--orange-deep)' }}>Planning a Kerala crawl?</p>
+                <p className="t-caps" style={{ color: 'var(--orange-deep)', marginBottom: 4 }}>
+                  Planning a {city} crawl?
+                </p>
                 <p style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 17, fontWeight: 600,
+                  fontSize: 16, fontWeight: 600,
                   color: 'var(--ink)', letterSpacing: '-0.02em',
                 }}>
                   You have <em style={{ color: 'var(--orange)' }}>{wishlistCount} spots</em> to visit →
@@ -193,16 +247,23 @@ export default function Explore() {
         </div>
       )}
 
-      {/* ── All restaurants ── */}
-      <div className="px-4 pb-4">
-        <div className="mb-4">
-          <SectionHead kicker="All restaurants" title={<>Your <em style={{ color: 'var(--ink-3)', fontStyle: 'italic' }}>collection</em></>} />
+      {/* ─── All restaurants ─── */}
+      <section style={{ padding: '0 var(--px)', marginBottom: 16 }}>
+        <div style={{ marginBottom: 14 }}>
+          <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 4 }}>All restaurants</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22, fontWeight: 600,
+            color: 'var(--ink)', letterSpacing: '-0.025em', lineHeight: 1.1,
+          }}>
+            Your <em style={{ color: 'var(--ink-3)', fontStyle: 'italic' }}>collection</em>
+          </h2>
         </div>
 
         {/* Search */}
-        <div className="relative mb-3">
+        <div style={{ position: 'relative', marginBottom: 12 }}>
           <svg
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
             width="15" height="15" viewBox="0 0 24 24" fill="none"
             stroke="var(--ink-4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           >
@@ -215,18 +276,23 @@ export default function Explore() {
             style={{
               width: '100%', height: 46,
               paddingLeft: 38, paddingRight: query ? 38 : 14,
-              fontSize: 14, borderRadius: 'var(--r-md)',
+              fontSize: 14, borderRadius: 'var(--r-pill)',
               border: '1.5px solid var(--line)',
               backgroundColor: 'var(--surface-2)',
               color: 'var(--ink)', outline: 'none',
-              boxShadow: 'var(--shadow-sm)',
+              fontFamily: 'var(--font-ui)',
             }}
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: 'var(--surface-3)', color: 'var(--ink-3)', border: 'none' }}
+              style={{
+                position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                width: 20, height: 20, borderRadius: '50%',
+                backgroundColor: 'var(--surface-3)', color: 'var(--ink-3)',
+                border: 'none', fontSize: 13, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
             >
               ×
             </button>
@@ -234,7 +300,10 @@ export default function Explore() {
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 mb-4">
+        <div
+          className="no-scrollbar"
+          style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 16 }}
+        >
           {[
             { key: 'all',      label: 'All',      count: total },
             { key: 'wishlist', label: 'Wishlist',  count: wishlistCount },
@@ -245,14 +314,16 @@ export default function Explore() {
               <button
                 key={key}
                 onClick={() => setFilter(key)}
-                className="shrink-0 flex items-center gap-1.5 font-semibold transition-all"
                 style={{
-                  height: 36, paddingLeft: 14, paddingRight: 14, fontSize: 13,
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  height: 36, paddingLeft: 14, paddingRight: 14,
+                  fontSize: 13, fontWeight: 600, flexShrink: 0,
                   borderRadius: 'var(--r-pill)',
                   backgroundColor: active ? 'var(--orange)' : 'var(--surface-2)',
                   color: active ? '#fff' : 'var(--ink-3)',
                   border: active ? 'none' : '1.5px solid var(--line)',
                   boxShadow: active ? '0 3px 10px rgba(245,98,45,0.28)' : 'none',
+                  cursor: 'pointer',
                 }}
               >
                 {label}
@@ -271,100 +342,121 @@ export default function Explore() {
         </div>
 
         <FilteredList restaurants={restaurants} query={query} filter={filter} />
-      </div>
+      </section>
     </PageWrapper>
   );
 }
 
-/* ── Hero Card ── */
-function HeroCard({ restaurant, image, onToggle, creatorPreviews }) {
-  const isWish = restaurant.status === 'wishlist';
-  const isVis  = restaurant.status === 'visited';
-  const isSaved = isWish || isVis;
+/* ─── Hero Card ─── */
+function HeroCard({ restaurant: r, image, onToggle, creatorPreviews }) {
+  const isSaved = r.status === 'wishlist' || r.status === 'visited';
+  const isWish  = r.status === 'wishlist';
 
   return (
-    <div
-      style={{
-        borderRadius: 'var(--r-xl)',
-        overflow: 'hidden',
-        boxShadow: 'var(--shadow-md)',
-        border: '1px solid var(--line)',
-        backgroundColor: 'var(--surface-2)',
-      }}
-    >
-      {/* Image section */}
-      <div className="relative img-ph" style={{ height: 280 }}>
+    <div style={{
+      borderRadius: 'var(--r-xl)',
+      overflow: 'hidden',
+      boxShadow: 'var(--shadow-md)',
+      backgroundColor: 'var(--surface-2)',
+      border: '1px solid var(--line)',
+    }}>
+      {/* Image */}
+      <div className="img-ph" style={{ position: 'relative', height: 360 }}>
         {image && (
           <img
-            src={image} alt={restaurant.name}
+            src={image} alt={r.name}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            loading="lazy"
+            loading="eager"
           />
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,10,5,0.80) 0%, rgba(20,10,5,0.08) 55%, transparent 100%)' }} />
+        {/* Gradient overlay */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,10,5,0.82) 0%, rgba(20,10,5,0.05) 50%, transparent 100%)' }} />
 
-        <div className="absolute top-3 left-3">
-          <Pill variant="dark" style={{ fontSize: 11 }}>✨ Picked for you</Pill>
+        {/* Top-left: "Picked for you" */}
+        <div style={{ position: 'absolute', top: 14, left: 14 }}>
+          <Pill variant="dark" style={{ fontSize: 12, gap: 5 }}>
+            ✦ Picked for you
+          </Pill>
         </div>
 
+        {/* Top-right: heart button */}
         <button
           onClick={onToggle}
-          className="absolute top-3 right-3 flex items-center justify-center rounded-full"
           style={{
-            width: 38, height: 38,
-            backgroundColor: isSaved ? 'var(--coral-soft)' : 'rgba(26,21,18,0.45)',
+            position: 'absolute', top: 14, right: 14,
+            width: 40, height: 40, borderRadius: '50%',
+            backgroundColor: isSaved ? '#fff' : 'rgba(253,250,246,0.2)',
             backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            color: isSaved ? 'var(--coral)' : '#fff',
-            fontSize: 17,
+            border: isSaved ? 'none' : '1px solid rgba(255,255,255,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 18, color: isWish ? 'var(--coral)' : isSaved ? 'var(--green)' : 'rgba(255,255,255,0.85)',
+            cursor: 'pointer',
           }}
         >
           {isSaved ? '♥' : '♡'}
         </button>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex gap-1.5 mb-2 flex-wrap">
-            {restaurant.cuisine?.split('·').slice(0, 2).map(c => (
+        {/* Bottom overlay: cuisine pills + name + location */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 16px 16px' }}>
+          {/* Cuisine pills + distance */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+            {r.cuisine?.split('·').slice(0, 2).map(c => (
               <Pill key={c} variant="dark" style={{ fontSize: 11 }}>{c.trim()}</Pill>
             ))}
+            <Pill variant="dark" style={{ fontSize: 11 }}>📍 1.2 km</Pill>
           </div>
-          <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color: '#fff', letterSpacing: '-0.025em', lineHeight: 1.1 }}>
-            {restaurant.name}
+          {/* Restaurant name */}
+          <p style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 38, fontWeight: 500,
+            color: '#fff',
+            letterSpacing: '-0.03em',
+            lineHeight: 0.96,
+            textWrap: 'pretty',
+          }}>
+            {r.name}
           </p>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
-            {restaurant.location}
+          {/* Location */}
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 6 }}>
+            {r.location?.split(',')[0]} · {r.location?.split(',')[1]?.trim() || ''}
           </p>
         </div>
       </div>
 
-      {/* Below-image section */}
-      <div style={{ padding: '14px 16px 16px' }}>
-        <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink-2)', fontStyle: 'italic' }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--ink)', marginRight: 4 }}>"</span>
-          {restaurant.notes || 'One of the most loved spots in Kerala — known for its signature biryani and coastal flavours.'}
+      {/* Below image */}
+      <div style={{ padding: '14px 16px 16px', backgroundColor: 'var(--surface-2)' }}>
+        {/* Quote */}
+        <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink-2)' }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 22, color: 'var(--ink)', marginRight: 5, lineHeight: 0 }}>"</span>
+          {r.notes || 'Known for their pepper crab and the view of Fort Kochi at sunset.'}
         </p>
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center gap-2">
-            <div style={{ display: 'flex' }}>
+
+        {/* Creator avatars + view details */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Overlapping avatars */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               {creatorPreviews.map((c, i) => (
-                <div key={c.id} style={{ marginLeft: i === 0 ? 0 : -8 }}>
-                  <Avatar name={c.name} color={c.color} size={26} ring />
+                <div key={c.id} style={{ marginLeft: i === 0 ? 0 : -10 }}>
+                  <Avatar name={c.name} color={c.color} size={28} ring />
                 </div>
               ))}
             </div>
-            <p style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>
-              <strong style={{ color: 'var(--ink)' }}>3 creators</strong> have been here
+            <p style={{ fontSize: 12, color: 'var(--ink-3)' }}>
+              <strong style={{ color: 'var(--ink)', fontWeight: 700 }}>3 creators</strong> have been here
             </p>
           </div>
-          <button
-            style={{
-              height: 36, paddingLeft: 14, paddingRight: 14,
-              borderRadius: 'var(--r-pill)',
-              backgroundColor: 'var(--ink)', color: '#fff',
-              fontSize: 13, fontWeight: 600, border: 'none',
-            }}
-          >
-            View details →
+
+          {/* View details button */}
+          <button style={{
+            height: 40, paddingLeft: 18, paddingRight: 18,
+            borderRadius: 'var(--r-pill)',
+            backgroundColor: 'var(--ink)', color: '#fff',
+            fontSize: 13, fontWeight: 700, border: 'none',
+            display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}>
+            View details <span style={{ fontSize: 15 }}>›</span>
           </button>
         </div>
       </div>
@@ -372,104 +464,110 @@ function HeroCard({ restaurant, image, onToggle, creatorPreviews }) {
   );
 }
 
-/* ── Trending Card ── */
-function TrendingCard({ restaurant, image, index, onToggle }) {
-  const isSaved = restaurant.status === 'wishlist' || restaurant.status === 'visited';
+/* ─── Trending Card ─── */
+function TrendingCard({ restaurant: r, image, index, onToggle }) {
+  const isSaved   = r.status === 'wishlist' || r.status === 'visited';
+  const isVisited = r.status === 'visited';
+
   return (
     <div
-      className="shrink-0 overflow-hidden fade-up"
+      className="fade-up"
       style={{
-        width: 130, borderRadius: 'var(--r-lg)',
+        width: 155, flexShrink: 0,
+        borderRadius: 'var(--r-lg)',
         animationDelay: `${index * 60}ms`,
         boxShadow: 'var(--shadow-sm)',
         border: '1px solid var(--line)',
         backgroundColor: 'var(--surface-2)',
+        overflow: 'hidden',
         scrollSnapAlign: 'start',
+        cursor: 'pointer',
       }}
     >
-      <div className="relative img-ph" style={{ height: 110 }}>
+      {/* Image */}
+      <div className="img-ph" style={{ position: 'relative', height: 130 }}>
         {image && (
-          <img src={image} alt={restaurant.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
+          <img src={image} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,21,18,0.65) 0%, transparent 55%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,21,18,0.5) 0%, transparent 60%)' }} />
         <button
           onClick={onToggle}
-          className="absolute top-2 right-2 flex items-center justify-center rounded-full"
           style={{
-            width: 28, height: 28, fontSize: 14,
-            backgroundColor: 'rgba(26,21,18,0.42)',
+            position: 'absolute', top: 8, right: 8,
+            width: 30, height: 30, borderRadius: '50%', border: 'none',
+            backgroundColor: isSaved ? '#fff' : 'rgba(26,21,18,0.38)',
             backdropFilter: 'blur(6px)',
-            border: 'none',
-            color: isSaved ? 'var(--coral)' : 'rgba(255,255,255,0.85)',
+            color: isSaved ? 'var(--coral)' : 'rgba(255,255,255,0.9)',
+            fontSize: 14,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
           }}
         >
           {isSaved ? '♥' : '♡'}
         </button>
       </div>
-      <div style={{ padding: '10px 11px 13px' }}>
-        <p style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
-          {restaurant.name}
+
+      {/* Info */}
+      <div style={{ padding: '10px 12px 12px' }}>
+        <p style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 14, fontWeight: 700,
+          color: 'var(--ink)', lineHeight: 1.2, letterSpacing: '-0.01em',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {r.name}
         </p>
-        <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 3 }}>
-          {restaurant.location?.split(',')[0]}
+        <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {r.location?.split(',')[0]}
         </p>
       </div>
     </div>
   );
 }
 
-/* ── Event Card ── */
+/* ─── Event Card ─── */
 function EventCard({ event: ev }) {
   const host = getCreator(ev.hostCreatorId);
   return (
-    <div
-      className="shrink-0 overflow-hidden"
-      style={{
-        width: 230, borderRadius: 'var(--r-lg)',
-        boxShadow: 'var(--shadow-sm)',
-        border: '1px solid var(--line)',
-        backgroundColor: 'var(--surface-2)',
-      }}
-    >
-      <div className="relative img-ph" style={{ height: 120 }}>
-        {ev.image && (
-          <img src={ev.image} alt={ev.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
-        )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,21,18,0.5) 0%, transparent 60%)' }} />
-        <div className="absolute top-2.5 left-2.5">
-          <Pill variant="amber" style={{ fontSize: 11 }}>
-            📅 {ev.date} · {ev.time}
-          </Pill>
+    <div style={{
+      width: 230, flexShrink: 0,
+      borderRadius: 'var(--r-lg)',
+      overflow: 'hidden',
+      backgroundColor: 'var(--surface-2)',
+      border: '1px solid var(--line)',
+      boxShadow: 'var(--shadow-sm)',
+    }}>
+      <div className="img-ph" style={{ position: 'relative', height: 110 }}>
+        {ev.image && <img src={ev.image} alt={ev.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,21,18,0.45) 0%, transparent 60%)' }} />
+        <div style={{ position: 'absolute', top: 10, left: 10 }}>
+          <Pill variant="amber" style={{ fontSize: 11 }}>📅 {ev.date} · {ev.time}</Pill>
         </div>
       </div>
-      <div style={{ padding: '12px 13px 14px' }}>
+      <div style={{ padding: '12px 14px 14px' }}>
         <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
           {ev.name}
         </p>
         {host && (
-          <div className="flex items-center gap-2 mt-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 8 }}>
             <Avatar name={host.name} color={host.color} size={20} />
             <p style={{ fontSize: 11, color: 'var(--ink-3)' }}>
               Hosted by <strong style={{ color: 'var(--ink-2)' }}>{host.name}</strong>
             </p>
           </div>
         )}
-        <div className="flex items-center justify-between mt-3">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
           {ev.spotsLeft <= 8 ? (
-            <span style={{ fontSize: 11, color: 'var(--coral)', fontWeight: 700 }}>
-              ● {ev.spotsLeft} spots left
-            </span>
+            <span style={{ fontSize: 11, color: 'var(--coral)', fontWeight: 700 }}>● {ev.spotsLeft} spots left</span>
           ) : (
             <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>{ev.attending} going</span>
           )}
-          <button
-            style={{
-              height: 30, paddingLeft: 14, paddingRight: 14,
-              borderRadius: 'var(--r-pill)',
-              backgroundColor: 'var(--orange)', color: '#fff',
-              fontSize: 12, fontWeight: 600, border: 'none',
-            }}
-          >
+          <button style={{
+            height: 30, paddingLeft: 14, paddingRight: 14,
+            borderRadius: 'var(--r-pill)',
+            backgroundColor: 'var(--orange)', color: '#fff',
+            fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer',
+          }}>
             Join
           </button>
         </div>
@@ -478,7 +576,7 @@ function EventCard({ event: ev }) {
   );
 }
 
-/* ── Filtered collection list ── */
+/* ─── Filtered list ─── */
 function FilteredList({ restaurants, query, filter }) {
   const q = query.toLowerCase();
   const filtered = restaurants.filter(r => {
@@ -488,7 +586,7 @@ function FilteredList({ restaurants, query, filter }) {
 
   if (filtered.length === 0) {
     return (
-      <div className="flex flex-col items-center text-center py-10">
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 40, paddingBottom: 24 }}>
         <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 12 }}>
           {query ? '🔍' : '🍽️'}
         </div>
@@ -503,20 +601,21 @@ function FilteredList({ restaurants, query, filter }) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {filtered.map((r, i) => <MiniCard key={r.id} restaurant={r} index={i} />)}
     </div>
   );
 }
 
-/* ── Mini card ── */
+/* ─── Mini card ─── */
 function MiniCard({ restaurant: r, index }) {
   const isVisited = r.status === 'visited';
   return (
     <div
-      className="flex items-center gap-3 fade-up"
+      className="fade-up"
       style={{
-        padding: '10px 12px',
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '10px 14px',
         backgroundColor: 'var(--surface-2)',
         border: '1px solid var(--line)',
         borderLeft: `3px solid ${isVisited ? 'var(--green)' : 'var(--orange)'}`,
@@ -532,17 +631,22 @@ function MiniCard({ restaurant: r, index }) {
       }}>
         {r.emoji}
       </div>
-      <div className="flex-1 min-w-0">
-        <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em' }} className="truncate">
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {r.name}
         </p>
-        <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 2 }} className="truncate">
+        <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {r.cuisine?.split('·')[0].trim()} · {r.location?.split(',')[0]}
         </p>
       </div>
-      <Pill variant={isVisited ? 'green' : 'coral'} style={{ fontSize: 11, flexShrink: 0 }}>
+      <span style={{
+        flexShrink: 0, fontSize: 11, fontWeight: 700,
+        padding: '4px 10px', borderRadius: 999,
+        backgroundColor: isVisited ? 'var(--green-soft)' : 'var(--coral-soft)',
+        color: isVisited ? 'var(--green)' : 'var(--coral)',
+      }}>
         {isVisited ? '✓' : '♡'}
-      </Pill>
+      </span>
     </div>
   );
 }

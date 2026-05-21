@@ -39,7 +39,7 @@ export default function Visited() {
     <div style={{ backgroundColor: 'var(--surface)', minHeight: '100dvh' }}>
 
       {/* ── Page header ── */}
-      <div style={{ padding: '24px 20px 20px' }}>
+      <div style={{ padding: '24px var(--px) 20px' }}>
         <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 8 }}>
           Your food diary
         </p>
@@ -55,7 +55,7 @@ export default function Visited() {
         </h1>
       </div>
 
-      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+      <div style={{ padding: '0 var(--px)', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
 
         {/* ── Stats Row (grid grid-cols-3 gap-3) ── */}
         {visited.length > 0 && (

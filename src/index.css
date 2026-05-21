@@ -35,6 +35,11 @@
   --shadow-md: 0 8px 24px rgba(40,20,10,0.10);
   --shadow-lg: 0 22px 48px rgba(40,20,10,0.16);
 
+  /* Layout */
+  --px: 20px;       /* page horizontal padding */
+  --px-card: 16px;  /* inset card horizontal padding (hero, posts) */
+  --px-sheet: 16px; /* map bottom-sheet horizontal padding */
+
   /* Typography */
   --font-display: "Fraunces", "Iowan Old Style", "Apple Garamond", Georgia, serif;
   --font-ui:      "DM Sans", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;

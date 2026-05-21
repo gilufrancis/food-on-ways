@@ -99,7 +99,7 @@ export default function Map() {
       {/* ─── Floating top overlay ─── */}
       <div
         style={{
-          position: 'absolute', top: 12, left: 12, right: 12, zIndex: 10,
+          position: 'absolute', top: 16, left: 16, right: 16, zIndex: 10,
           display: 'flex', flexDirection: 'column', gap: 10,
         }}
       >
@@ -208,7 +208,7 @@ export default function Map() {
       {/* ─── Right-side controls ─── */}
       <div
         style={{
-          position: 'absolute', right: 12, zIndex: 10,
+          position: 'absolute', right: 16, zIndex: 10,
           display: 'flex', flexDirection: 'column', gap: 8,
           top: '50%', transform: 'translateY(-50%)',
         }}
@@ -323,7 +323,7 @@ function DefaultSheet({ restaurants, count, city, onSelect, onExpand }) {
   return (
     <div>
       {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '2px 18px 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '2px var(--px-sheet) 4px' }}>
         <div>
           <p style={{
             fontFamily: 'var(--font-display)',
@@ -350,7 +350,7 @@ function DefaultSheet({ restaurants, count, city, onSelect, onExpand }) {
       {/* Horizontal bento cards */}
       <div
         className="flex gap-3 overflow-x-auto no-scrollbar"
-        style={{ padding: '10px 18px 14px', scrollSnapType: 'x mandatory' }}
+        style={{ padding: '10px var(--px-sheet) 14px', scrollSnapType: 'x mandatory' }}
       >
         {restaurants.slice(0, 8).map(r => (
           <BentoCard key={r.id} restaurant={r} onSelect={onSelect} />
@@ -365,7 +365,7 @@ function DefaultSheet({ restaurants, count, city, onSelect, onExpand }) {
       {/* Legend */}
       <div
         className="flex items-center gap-4 flex-wrap"
-        style={{ paddingLeft: 18, paddingRight: 18, paddingBottom: 6 }}
+        style={{ paddingLeft: 'var(--px-sheet)', paddingRight: 'var(--px-sheet)', paddingBottom: 6 }}
       >
         <LegendDot color="var(--orange)" label="Wishlist" />
         <LegendDot color="var(--green)" label="Visited" />
@@ -454,7 +454,7 @@ function SelectedCard({ restaurant: r, onClose, onToggle, onExpand }) {
   const isVisited = r.status === 'visited';
   const image = HERO_IMAGES[r.id];
   return (
-    <div style={{ padding: '4px 16px 16px' }}>
+    <div style={{ padding: '4px var(--px-sheet) 16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
         {/* Thumbnail */}
         <div className="img-ph" style={{ width: 56, height: 56, borderRadius: 'var(--r-md)', flexShrink: 0, overflow: 'hidden' }}>
@@ -516,7 +516,7 @@ function SelectedCard({ restaurant: r, onClose, onToggle, onExpand }) {
 function ExpandedSheet({ restaurants, count, city, onSelect, onCollapse }) {
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 18px 14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px var(--px-sheet) 14px' }}>
         <div>
           <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
             {count} <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>spots</em> on this map
@@ -553,7 +553,7 @@ function ExpandedRow({ restaurant: r, index, onSelect }) {
       onClick={() => onSelect(r)}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        padding: '12px 18px',
+        padding: '12px var(--px-sheet)',
         borderTop: index !== 0 ? '1px solid var(--line)' : 'none',
         background: 'none', border: index !== 0 ? undefined : 'none',
         width: '100%', textAlign: 'left',

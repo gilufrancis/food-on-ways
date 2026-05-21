@@ -20,7 +20,7 @@ export default function Wishlist() {
     <div style={{ backgroundColor: 'var(--surface)', minHeight: '100dvh' }}>
 
       {/* Header */}
-      <div style={{ padding: '24px 20px 20px' }}>
+      <div style={{ padding: '24px var(--px) 20px' }}>
         <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 8 }}>Your saved places</p>
         <h1 style={{
           fontFamily: 'var(--font-display)',
@@ -66,7 +66,7 @@ export default function Wishlist() {
           </button>
         </div>
       ) : (
-        <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+        <div style={{ padding: '0 var(--px)', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
 
           {/* Trip-plan nudge */}
           {cities.some(([, rs]) => rs.length >= 2) && (

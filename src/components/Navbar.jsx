@@ -4,11 +4,11 @@ import { useRestaurants } from '../context/RestaurantContext';
 import AddRestaurantModal from './AddRestaurantModal';
 
 const NAV = [
-  { to: '/',         label: 'Home',    Icon: HomeIcon    },
-  { to: '/map',      label: 'Map',     Icon: MapIcon     },
-  { to: '/wishlist', label: 'Wishlist', Icon: HeartIcon  },
-  { to: '/visited',  label: 'Visited', Icon: CheckIcon   },
-  { to: '/profile',  label: 'Profile', Icon: PersonIcon  },
+  { to: '/',         label: 'Home',    Icon: HomeIcon,   end: true  },
+  { to: '/map',      label: 'Map',     Icon: MapIcon,    end: true  },
+  { to: '/wishlist', label: 'Wishlist', Icon: HeartIcon, end: false },
+  { to: '/visited',  label: 'Visited', Icon: CheckIcon,  end: false },
+  { to: '/profile',  label: 'Profile', Icon: PersonIcon, end: false },
 ];
 
 export default function Navbar() {
@@ -18,48 +18,91 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Top bar ── */}
+      {/* ── Editorial top bar ── */}
       <header
-        className="w-full flex items-center justify-between sticky top-0 z-40 shrink-0"
         style={{
-          height: 56,
-          paddingLeft: 20,
-          paddingRight: 16,
           backgroundColor: 'var(--surface)',
           borderBottom: '1px solid var(--line)',
-          boxShadow: '0 1px 0 var(--line)',
+          padding: '12px var(--px) 10px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
         }}
       >
-        <div className="flex items-center gap-2.5">
-          <div
-            style={{
-              width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-              backgroundColor: 'var(--orange)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-            }}
-          >
-            🍽️
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Left — stacked kicker */}
+          <div style={{ flex: '0 0 auto' }}>
+            <p className="t-caps" style={{ color: 'var(--orange)', letterSpacing: '0.1em' }}>Good taste,</p>
+            <p className="t-caps" style={{ color: 'var(--ink-3)', letterSpacing: '0.1em', marginTop: 2 }}>great places.</p>
           </div>
-          <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
+
+          {/* Center — wordmark */}
+          <p style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 20, fontWeight: 500,
+            letterSpacing: '-0.025em',
+            color: 'var(--ink)',
+            position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+          }}>
             Food <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>on</em> Ways
           </p>
-        </div>
 
-        <button
-          onClick={() => setOpen(true)}
-          style={{
-            height: 36, paddingLeft: 16, paddingRight: 16,
-            borderRadius: 'var(--r-pill)',
-            backgroundColor: 'var(--orange)',
-            color: '#fff', fontWeight: 700, fontSize: 13,
-            border: 'none',
-            boxShadow: '0 3px 10px rgba(245,98,45,0.38)',
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}
-        >
-          + Add
-        </button>
+          {/* Right — bell */}
+          <button
+            style={{
+              position: 'relative',
+              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+              backgroundColor: 'var(--surface-2)',
+              border: '1px solid var(--line)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flex: '0 0 auto',
+            }}
+            aria-label="Notifications"
+          >
+            <BellIcon />
+            {/* Unread dot */}
+            <span style={{
+              position: 'absolute', top: 6, right: 6,
+              width: 8, height: 8, borderRadius: '50%',
+              backgroundColor: 'var(--orange)',
+              border: '1.5px solid var(--surface)',
+            }} />
+          </button>
+        </div>
       </header>
+
+      {/* ── Floating + FAB (sits in the page flow via the container) ── */}
+      {/* Rendered as a portal-like fixed element capped at max-w-md */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 66,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: 448,
+          pointerEvents: 'none',
+          zIndex: 50,
+        }}
+      >
+        <div style={{ position: 'absolute', right: 16, top: 0, pointerEvents: 'all' }}>
+          <button
+            onClick={() => setOpen(true)}
+            style={{
+              width: 52, height: 52, borderRadius: '50%',
+              backgroundColor: 'var(--orange)',
+              color: '#fff',
+              fontSize: 28, fontWeight: 300, lineHeight: 1,
+              border: 'none',
+              boxShadow: '0 4px 16px rgba(245,98,45,0.45)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+            aria-label="Add restaurant"
+          >
+            +
+          </button>
+        </div>
+      </div>
 
       {/* ── Bottom nav ── */}
       <nav
@@ -78,13 +121,13 @@ export default function Navbar() {
           boxShadow: '0 -4px 20px rgba(26,21,18,0.07)',
         }}
       >
-        {NAV.map(({ to, label, Icon }) => (
+        {NAV.map(({ to, label, Icon, end }) => (
           <NavLink
             key={to}
             to={to}
-            end={to === '/' || to === '/map'}
-            className="flex flex-col items-center justify-center flex-1 pt-2 pb-1.5 gap-0.5"
-            style={{ minHeight: 56 }}
+            end={end}
+            className="flex flex-col items-center justify-center flex-1 gap-0.5"
+            style={{ minHeight: 56, paddingTop: 8, paddingBottom: 6 }}
           >
             {({ isActive }) => (
               <>
@@ -99,7 +142,6 @@ export default function Navbar() {
                   }}
                 >
                   <Icon active={isActive} />
-                  {/* Wishlist badge */}
                   {label === 'Wishlist' && wishlistCount > 0 && (
                     <span style={{
                       position: 'absolute', top: 0, right: 4,
@@ -134,6 +176,13 @@ export default function Navbar() {
 }
 
 /* ── Icons ── */
+function BellIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+    </svg>
+  );
+}
 function HomeIcon({ active }) {
   const c = active ? 'var(--orange)' : 'var(--ink-4)';
   return (
