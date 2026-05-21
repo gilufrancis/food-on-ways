@@ -4,8 +4,8 @@ import { useRestaurants } from '../context/RestaurantContext';
 import AddRestaurantModal from './AddRestaurantModal';
 
 const NAV = [
-  { to: '/',         label: 'Home',    Icon: HomeIcon,   end: true  },
-  { to: '/map',      label: 'Map',     Icon: MapIcon,    end: true  },
+  { to: '/',         label: 'Map',     Icon: MapIcon,    end: true  },
+  { to: '/explore',  label: 'Home',    Icon: HomeIcon,   end: true  },
   { to: '/wishlist', label: 'Wishlist', Icon: HeartIcon, end: false },
   { to: '/visited',  label: 'Visited', Icon: CheckIcon,  end: false },
   { to: '/profile',  label: 'Profile', Icon: PersonIcon, end: false },

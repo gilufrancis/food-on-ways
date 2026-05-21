@@ -112,7 +112,7 @@ export default function Explore() {
             </h2>
           </div>
           <button
-            onClick={() => navigate('/map')}
+            onClick={() => navigate('/')}
             className="t-caps"
             style={{ color: 'var(--orange)', border: 'none', background: 'none', paddingBottom: 2 }}
           >
@@ -144,7 +144,7 @@ export default function Explore() {
 
           {/* "See all on map" card */}
           <button
-            onClick={() => navigate('/map')}
+            onClick={() => navigate('/')}
             style={{
               width: 130, flexShrink: 0, borderRadius: 'var(--r-lg)',
               background: 'var(--ink)', color: '#fff',

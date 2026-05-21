@@ -53,7 +53,7 @@ export default function Wishlist() {
             Explore the feed or tap + Add to save your first restaurant
           </p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/explore')}
             style={{
               height: 44, paddingLeft: 24, paddingRight: 24,
               borderRadius: 'var(--r-pill)',

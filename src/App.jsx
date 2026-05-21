@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RestaurantProvider } from './context/RestaurantContext';
 import Navbar from './components/Navbar';
-import Home from './pages/Explore';
 import Map from './pages/Map';
+import Home from './pages/Explore';
 import Wishlist from './pages/Wishlist';
 import Visited from './pages/Visited';
 import Profile from './pages/Profile';
@@ -30,8 +30,8 @@ export default function App() {
             <Navbar />
             <main className="flex-1 min-w-0">
               <Routes>
-                <Route path="/"         element={<Home />} />
-                <Route path="/map"      element={<Map />} />
+                <Route path="/"         element={<Map />} />
+                <Route path="/explore"  element={<Home />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/visited"  element={<Visited />} />
                 <Route path="/profile"  element={<Profile />} />

@@ -31,7 +31,7 @@ export default function CreatorPostCard({ post, index = 0 }) {
   };
 
   const handleMapPin = () => {
-    if (restaurant?.lat) navigate('/map');
+    if (restaurant?.lat) navigate('/');
   };
 
   return (
