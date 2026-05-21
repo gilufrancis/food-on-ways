@@ -8,7 +8,7 @@ const NAV = [
   { to: '/explore',  label: 'Home',    Icon: HomeIcon,   end: true  },
   { to: '/wishlist', label: 'Wishlist', Icon: HeartIcon, end: false },
   { to: '/visited',  label: 'Visited', Icon: CheckIcon,  end: false },
-  { to: '/profile',  label: 'Profile', Icon: PersonIcon, end: false },
+  { to: '/vlogs',    label: 'Vlogs',   Icon: VideoIcon,  end: false },
 ];
 
 export default function Navbar() {
@@ -223,6 +223,15 @@ function PersonIcon({ active }) {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
+    </svg>
+  );
+}
+function VideoIcon({ active }) {
+  const c = active ? 'var(--orange)' : 'var(--ink-4)';
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7"/>
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
     </svg>
   );
 }
