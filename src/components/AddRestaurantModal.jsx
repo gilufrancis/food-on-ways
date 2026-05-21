@@ -8,14 +8,19 @@ const EMOJIS = [
   '☕','🧋','🍵','🥤','🍹','🫖','🍺','🍻','🥂','🍷',
 ];
 
-const DEFAULT = { emoji: '🍛', name: '', cuisine: '', location: '', lat: '', lng: '', status: 'wishlist', rating: null, notes: '' };
+const DEFAULT = {
+  emoji: '🍛', name: '', cuisine: '', location: '',
+  lat: '', lng: '', status: 'wishlist', rating: null, notes: '',
+};
 
-const BRAND = 'var(--orange)';
+const PX = 24; /* modal horizontal padding */
 
 export default function AddRestaurantModal({ onClose, existing }) {
   const { dispatch } = useRestaurants();
   const [form, setForm] = useState(
-    existing ? { ...existing, lat: String(existing.lat ?? ''), lng: String(existing.lng ?? '') } : DEFAULT
+    existing
+      ? { ...existing, lat: String(existing.lat ?? ''), lng: String(existing.lng ?? '') }
+      : DEFAULT
   );
   const [errors, setErrors] = useState({});
 
@@ -37,11 +42,16 @@ export default function AddRestaurantModal({ onClose, existing }) {
     return e;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (ev) => {
+    ev.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    const payload = { ...form, name: form.name.trim(), lat: form.lat ? +form.lat : null, lng: form.lng ? +form.lng : null };
+    const payload = {
+      ...form,
+      name: form.name.trim(),
+      lat: form.lat ? +form.lat : null,
+      lng: form.lng ? +form.lng : null,
+    };
     if (existing) {
       dispatch({ type: 'EDIT_RESTAURANT', payload });
     } else {
@@ -50,64 +60,111 @@ export default function AddRestaurantModal({ onClose, existing }) {
     onClose();
   };
 
-  const inputStyle = (err) => ({
-    height: 52, paddingLeft: 14, paddingRight: 14, fontSize: 15,
+  const field = (err) => ({
+    height: 50,
+    paddingLeft: 14, paddingRight: 14,
+    fontSize: 14,
     borderRadius: 'var(--r-md)',
     border: `1.5px solid ${err ? 'var(--coral)' : 'var(--line)'}`,
-    width: '100%', background: 'var(--surface)', outline: 'none',
+    backgroundColor: 'var(--surface-2)',
     color: 'var(--ink)',
+    outline: 'none',
+    width: '100%',
     fontFamily: 'var(--font-ui)',
   });
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
-      style={{ backgroundColor: 'rgba(26,21,18,0.55)', backdropFilter: 'blur(4px)' }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 50,
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        backgroundColor: 'rgba(26,21,18,0.55)',
+        backdropFilter: 'blur(4px)',
+      }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="bg-white w-full overflow-y-auto rounded-t-3xl md:rounded-2xl md:max-w-md"
         style={{
+          width: '100%', maxWidth: 448,
           maxHeight: '94dvh',
-          paddingBottom: 'env(safe-area-inset-bottom)',
+          backgroundColor: 'var(--surface)',
+          borderRadius: '28px 28px 0 0',
           boxShadow: 'var(--shadow-lg)',
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
         {/* Drag handle */}
-        <div className="md:hidden flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1.5 rounded-full bg-gray-200" />
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 4, flexShrink: 0 }}>
+          <div style={{ width: 36, height: 4, borderRadius: 99, backgroundColor: 'var(--line)' }} />
         </div>
 
-        {/* Header */}
-        <div className="sticky top-0 bg-white flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-extrabold text-gray-900">
+        {/* Sticky header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: `14px ${PX}px 14px`,
+          borderBottom: '1px solid var(--line)',
+          backgroundColor: 'var(--surface)',
+          flexShrink: 0,
+        }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 20, fontWeight: 600,
+            color: 'var(--ink)', letterSpacing: '-0.02em',
+          }}>
             {existing ? 'Edit Restaurant' : 'Add Restaurant'}
           </h2>
           <button
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 text-xl font-bold"
-            style={{ backgroundColor: '#f3f4f6' }}
+            style={{
+              width: 34, height: 34, borderRadius: '50%',
+              backgroundColor: 'var(--surface-2)',
+              border: '1px solid var(--line)',
+              fontSize: 18, color: 'var(--ink-3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+            aria-label="Close"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-5 py-5 space-y-5">
+        {/* Scrollable form */}
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            overflowY: 'auto',
+            flex: 1,
+            padding: `20px ${PX}px`,
+            display: 'flex', flexDirection: 'column', gap: 20,
+            paddingBottom: `calc(24px + env(safe-area-inset-bottom))`,
+          }}
+        >
 
           {/* Emoji picker */}
           <div>
-            <Label>Icon</Label>
-            <div className="grid grid-cols-8 gap-1.5 p-3 bg-gray-50 rounded-2xl max-h-40 overflow-y-auto">
+            <FieldLabel>Icon</FieldLabel>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)',
+              gap: 6, padding: 12,
+              backgroundColor: 'var(--surface-2)',
+              borderRadius: 'var(--r-lg)',
+              border: '1px solid var(--line)',
+              maxHeight: 164, overflowY: 'auto',
+            }}>
               {EMOJIS.map(em => (
                 <button
                   type="button" key={em}
                   onClick={() => set('emoji', em)}
-                  className="flex items-center justify-center rounded-xl transition-all"
                   style={{
-                    fontSize: 24, aspectRatio: '1', minHeight: 44,
-                    backgroundColor: form.emoji === em ? '#fff2ee' : 'transparent',
-                    outline: form.emoji === em ? '2px solid #ff5c28' : 'none',
+                    fontSize: 22, aspectRatio: '1', minHeight: 40,
+                    borderRadius: 10,
+                    backgroundColor: form.emoji === em ? 'var(--surface)' : 'transparent',
+                    outline: form.emoji === em ? '2px solid var(--orange)' : 'none',
                     outlineOffset: -2,
+                    border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'background-color 120ms',
                   }}
                 >
                   {em}
@@ -118,119 +175,160 @@ export default function AddRestaurantModal({ onClose, existing }) {
 
           {/* Name */}
           <div>
-            <Label required>Restaurant Name</Label>
+            <FieldLabel required>Restaurant Name</FieldLabel>
             <input
               type="text" value={form.name}
               onChange={e => set('name', e.target.value)}
               placeholder="e.g. Paragon Restaurant"
-              style={inputStyle(errors.name)} autoComplete="off"
+              style={field(errors.name)}
+              autoComplete="off"
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name}</p>}
+            {errors.name && <p style={{ fontSize: 12, color: 'var(--coral)', marginTop: 6 }}>{errors.name}</p>}
           </div>
 
           {/* Cuisine */}
           <div>
-            <Label>Cuisine Type</Label>
+            <FieldLabel>Cuisine Type</FieldLabel>
             <input
               type="text" value={form.cuisine}
               onChange={e => set('cuisine', e.target.value)}
               placeholder="Kerala, Seafood, Italian…"
-              style={inputStyle(false)} autoComplete="off"
+              style={field(false)}
+              autoComplete="off"
             />
           </div>
 
           {/* Location */}
           <div>
-            <Label>Location</Label>
+            <FieldLabel>Location</FieldLabel>
             <input
               type="text" value={form.location}
               onChange={e => set('location', e.target.value)}
               placeholder="Kozhikode, Kerala"
-              style={inputStyle(false)} autoComplete="off"
+              style={field(false)}
+              autoComplete="off"
             />
           </div>
 
           {/* Lat / Lng */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Latitude</Label>
-              <input type="text" inputMode="decimal" value={form.lat}
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <FieldLabel>Latitude</FieldLabel>
+              <input
+                type="text" inputMode="decimal" value={form.lat}
                 onChange={e => set('lat', e.target.value)}
-                placeholder="11.2588" style={inputStyle(errors.lat)} />
-              {errors.lat && <p className="text-red-500 text-xs mt-1">{errors.lat}</p>}
+                placeholder="11.2588"
+                style={field(errors.lat)}
+              />
+              {errors.lat && <p style={{ fontSize: 12, color: 'var(--coral)', marginTop: 6 }}>{errors.lat}</p>}
             </div>
-            <div>
-              <Label>Longitude</Label>
-              <input type="text" inputMode="decimal" value={form.lng}
+            <div style={{ flex: 1 }}>
+              <FieldLabel>Longitude</FieldLabel>
+              <input
+                type="text" inputMode="decimal" value={form.lng}
                 onChange={e => set('lng', e.target.value)}
-                placeholder="75.7804" style={inputStyle(errors.lng)} />
-              {errors.lng && <p className="text-red-500 text-xs mt-1">{errors.lng}</p>}
+                placeholder="75.7804"
+                style={field(errors.lng)}
+              />
+              {errors.lng && <p style={{ fontSize: 12, color: 'var(--coral)', marginTop: 6 }}>{errors.lng}</p>}
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <Label>Notes</Label>
+            <FieldLabel>Notes</FieldLabel>
             <textarea
               value={form.notes}
               onChange={e => set('notes', e.target.value)}
               placeholder="Any notes about this place…"
               rows={2}
-              style={{ ...inputStyle(false), height: 'auto', paddingTop: 14, paddingBottom: 14, resize: 'none' }}
+              style={{
+                ...field(false),
+                height: 'auto', paddingTop: 12, paddingBottom: 12,
+                resize: 'none', lineHeight: 1.5,
+              }}
             />
           </div>
 
           {/* Status */}
           <div>
-            <Label>Status</Label>
-            <div className="flex gap-3">
+            <FieldLabel>Status</FieldLabel>
+            <div style={{ display: 'flex', gap: 10 }}>
               {[
-                { val: 'wishlist', label: '❤️ Want to Visit',   border: '#ff5c28', bg: '#fff7ed', clr: '#c2410c' },
-                { val: 'visited',  label: '✅ Already Visited', border: '#22c55e', bg: '#f0fdf4', clr: '#15803d' },
-              ].map(({ val, label, border, bg, clr }) => (
-                <button
-                  key={val} type="button" onClick={() => set('status', val)}
-                  className="flex-1 text-sm font-semibold rounded-2xl transition-all"
-                  style={{
-                    minHeight: 52,
-                    border: `2px solid ${form.status === val ? border : '#e5e7eb'}`,
-                    backgroundColor: form.status === val ? bg : '#fafafa',
-                    color: form.status === val ? clr : '#9ca3af',
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
+                { val: 'wishlist', label: '♥ Want to Visit',   active: { border: 'var(--orange)', bg: 'var(--orange-soft)', color: 'var(--orange-deep)' } },
+                { val: 'visited',  label: '✓ Already Visited', active: { border: 'var(--green)',  bg: 'var(--green-soft)',  color: 'var(--green)' } },
+              ].map(({ val, label, active }) => {
+                const isActive = form.status === val;
+                return (
+                  <button
+                    key={val} type="button"
+                    onClick={() => set('status', val)}
+                    style={{
+                      flex: 1, minHeight: 50,
+                      borderRadius: 'var(--r-md)',
+                      border: `2px solid ${isActive ? active.border : 'var(--line)'}`,
+                      backgroundColor: isActive ? active.bg : 'var(--surface-2)',
+                      color: isActive ? active.color : 'var(--ink-4)',
+                      fontSize: 13, fontWeight: 700,
+                      fontFamily: 'var(--font-ui)',
+                      transition: 'all 150ms',
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-1 pb-2">
+          <div style={{ display: 'flex', gap: 10, paddingTop: 4 }}>
             <button
               type="button" onClick={onClose}
-              className="flex-1 text-sm font-semibold text-gray-600 rounded-2xl"
-              style={{ minHeight: 54, border: '1.5px solid #e5e7eb', backgroundColor: '#fafafa' }}
+              style={{
+                flex: 1, minHeight: 52,
+                borderRadius: 'var(--r-pill)',
+                border: '1.5px solid var(--line)',
+                backgroundColor: 'var(--surface-2)',
+                fontSize: 14, fontWeight: 600,
+                color: 'var(--ink-3)',
+                fontFamily: 'var(--font-ui)',
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 text-sm font-bold text-white rounded-2xl"
-              style={{ minHeight: 54, background: BRAND, boxShadow: '0 4px 14px rgba(255,92,40,0.4)' }}
+              style={{
+                flex: 2, minHeight: 52,
+                borderRadius: 'var(--r-pill)',
+                backgroundColor: 'var(--orange)',
+                color: '#fff', border: 'none',
+                fontSize: 14, fontWeight: 700,
+                fontFamily: 'var(--font-ui)',
+                boxShadow: '0 4px 14px rgba(245,98,45,0.38)',
+              }}
             >
               {existing ? 'Save Changes' : 'Add Restaurant'}
             </button>
           </div>
+
         </form>
       </div>
     </div>
   );
 }
 
-function Label({ children, required }) {
+function FieldLabel({ children, required }) {
   return (
-    <label className="block text-sm font-semibold text-gray-700 mb-2">
-      {children}{required && <span className="text-red-400 ml-0.5">*</span>}
-    </label>
+    <p style={{
+      fontSize: 13, fontWeight: 600,
+      color: 'var(--ink-2)',
+      marginBottom: 8,
+      fontFamily: 'var(--font-ui)',
+    }}>
+      {children}
+      {required && <span style={{ color: 'var(--coral)', marginLeft: 2 }}>*</span>}
+    </p>
   );
 }
