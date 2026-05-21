@@ -20,29 +20,45 @@ export default function Vlogs() {
       {/* Header */}
       <div style={{ padding: '24px var(--px) 16px' }}>
         <p className="t-caps" style={{ color: 'var(--ink-3)', marginBottom: 8 }}>Your saved content</p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 28, fontWeight: 500,
-            color: 'var(--ink)',
-            letterSpacing: '-0.025em', lineHeight: 1.05,
-          }}>
-            Food <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>vlogs</em>
-          </h1>
-          <button
-            onClick={() => setAdding(true)}
-            style={{
-              height: 38, paddingLeft: 16, paddingRight: 16,
-              borderRadius: 'var(--r-pill)',
-              backgroundColor: 'var(--orange)', color: '#fff',
-              fontSize: 13, fontWeight: 700, border: 'none',
-              display: 'flex', alignItems: 'center', gap: 6,
-              boxShadow: '0 3px 10px rgba(245,98,45,0.3)',
-            }}
-          >
-            + Add vlog
-          </button>
-        </div>
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 28, fontWeight: 500,
+          color: 'var(--ink)',
+          letterSpacing: '-0.025em', lineHeight: 1.05,
+        }}>
+          Food <em style={{ color: 'var(--orange)', fontStyle: 'italic' }}>vlogs</em>
+        </h1>
+      </div>
+
+      {/* Fixed FAB — sits above the bottom nav */}
+      <div style={{
+        position: 'fixed',
+        bottom: 'calc(72px + env(safe-area-inset-bottom))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: 448,
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 30,
+      }}>
+        <button
+          onClick={() => setAdding(true)}
+          style={{
+            pointerEvents: 'all',
+            height: 52,
+            paddingLeft: 24, paddingRight: 24,
+            borderRadius: 'var(--r-pill)',
+            backgroundColor: 'var(--orange)', color: '#fff',
+            fontSize: 15, fontWeight: 700, border: 'none',
+            display: 'flex', alignItems: 'center', gap: 8,
+            boxShadow: '0 6px 20px rgba(245,98,45,0.45)',
+          }}
+        >
+          <span style={{ fontSize: 22, fontWeight: 300, lineHeight: 1 }}>+</span>
+          Add vlog
+        </button>
       </div>
 
       {vlogs.length === 0 ? (
