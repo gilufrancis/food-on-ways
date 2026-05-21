@@ -10,23 +10,24 @@ L.Icon.Default.mergeOptions({
   shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function makeIcon(color) {
+function makePin(fill, strokeColor = 'white', strokeWidth = 2) {
   return L.divIcon({
     className: '',
-    html: `<div style="width:30px;height:40px;filter:drop-shadow(0 4px 6px rgba(60,30,10,0.32))">
-      <svg viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M15 0C6.716 0 0 6.716 0 15c0 10.25 15 25 15 25S30 25.25 30 15C30 6.716 23.284 0 15 0z" fill="${color}" stroke="white" stroke-width="2"/>
-        <circle cx="15" cy="15" r="6" fill="white"/>
+    html: `<div style="width:34px;height:44px;filter:drop-shadow(0 6px 8px rgba(60,30,10,0.32))">
+      <svg viewBox="0 0 34 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17 0C7.611 0 0 7.611 0 17c0 11.55 17 27 17 27S34 28.55 34 17C34 7.611 26.389 0 17 0z"
+          fill="${fill}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+        <circle cx="17" cy="17" r="6.5" fill="white"/>
       </svg>
     </div>`,
-    iconSize:    [30, 40],
-    iconAnchor:  [15, 40],
-    popupAnchor: [0, -40],
+    iconSize:    [34, 44],
+    iconAnchor:  [17, 44],
+    popupAnchor: [0, -44],
   });
 }
 
-const wishlistIcon = makeIcon('#F5622D');
-const visitedIcon  = makeIcon('#2D6A4F');
+const wishlistPin = makePin('#F5622D');
+const visitedPin  = makePin('#2D6A4F');
 
 function FlyTo({ target }) {
   const map = useMap();
@@ -36,12 +37,20 @@ function FlyTo({ target }) {
   return null;
 }
 
-export default function MapView({ restaurants, flyTarget, onPinClick }) {
+function MapControl({ onMapReady }) {
+  const map = useMap();
+  useEffect(() => {
+    if (onMapReady) onMapReady(map);
+  }, [map, onMapReady]);
+  return null;
+}
+
+export default function MapView({ restaurants, flyTarget, onPinClick, onMapReady }) {
   const withCoords = restaurants.filter(r => r.lat != null && r.lng != null);
-  const center = withCoords.length ? [withCoords[0].lat, withCoords[0].lng] : [10.5, 76.2];
+  const center = withCoords.length ? [withCoords[0].lat, withCoords[0].lng] : [11.25, 75.78];
 
   return (
-    <MapContainer center={center} zoom={7} style={{ width: '100%', height: '100%' }} zoomControl={false}>
+    <MapContainer center={center} zoom={8} style={{ width: '100%', height: '100%' }} zoomControl={false}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -50,11 +59,12 @@ export default function MapView({ restaurants, flyTarget, onPinClick }) {
         <Marker
           key={r.id}
           position={[r.lat, r.lng]}
-          icon={r.status === 'visited' ? visitedIcon : wishlistIcon}
+          icon={r.status === 'visited' ? visitedPin : wishlistPin}
           eventHandlers={onPinClick ? { click: () => onPinClick(r) } : {}}
         />
       ))}
       {flyTarget && <FlyTo target={flyTarget} />}
+      {onMapReady && <MapControl onMapReady={onMapReady} />}
     </MapContainer>
   );
 }

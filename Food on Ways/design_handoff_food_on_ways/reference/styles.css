@@ -1,0 +1,228 @@
+/* Food on Ways — design tokens & global styles */
+
+:root {
+  --orange: #F5622D;
+  --orange-soft: #FBE2D6;
+  --orange-deep: #C84313;
+  --surface: #FDFAF6;
+  --surface-2: #F6EFE5;
+  --surface-3: #EFE5D5;
+  --ink: #1A1512;
+  --ink-2: #4A3F36;
+  --ink-3: #8B7B6E;
+  --ink-4: #BCAE9F;
+  --line: #E9DECE;
+  --coral: #E94B6A;
+  --coral-soft: #FDE0E6;
+  --green: #2D6A4F;
+  --green-soft: #D6E8DC;
+  --amber: #F2A93D;
+  --amber-soft: #FBE7BE;
+  --cream: #F1E6D2;
+  --plum: #6E2B4A;
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+
+  --shadow-sm: 0 2px 6px rgba(40, 20, 10, 0.06);
+  --shadow-md: 0 8px 24px rgba(40, 20, 10, 0.10);
+  --shadow-lg: 0 22px 48px rgba(40, 20, 10, 0.16);
+
+  --font-display: "Fraunces", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-ui: "DM Sans", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: #2A201A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
+input, textarea { font-family: inherit; color: inherit; }
+
+/* Mobile screen shell — each artboard wraps screens in this */
+.fw-screen {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  background: var(--surface);
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  isolation: isolate;
+}
+
+/* Type helpers */
+.t-display { font-family: var(--font-display); letter-spacing: -0.02em; font-weight: 500; }
+.t-italic  { font-style: italic; }
+.t-caps    { text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; }
+.t-mono    { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; }
+
+/* Image placeholder — warm gradient + diagonal weave + monospace caption */
+.img-ph {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--surface-3), var(--surface-2));
+  isolation: isolate;
+}
+.img-ph::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.025) 0 6px, transparent 6px 14px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.img-ph .img-ph-tag {
+  position: absolute;
+  left: 10px; bottom: 10px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: rgba(26,21,18,0.55);
+  background: rgba(253,250,246,0.82);
+  padding: 4px 7px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+/* Pill */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(253,250,246,0.85);
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.6);
+  white-space: nowrap;
+}
+.pill.dark { background: rgba(26,21,18,0.55); color: #fff; border-color: rgba(255,255,255,0.18); }
+.pill.orange { background: var(--orange); color: #fff; border-color: transparent; }
+.pill.amber { background: var(--amber-soft); color: #6E4A0F; border-color: transparent; }
+.pill.green { background: var(--green-soft); color: var(--green); border-color: transparent; }
+.pill.coral { background: var(--coral-soft); color: var(--coral); border-color: transparent; }
+.pill.outline { background: transparent; border: 1px solid var(--line); color: var(--ink-2); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 18px; border-radius: var(--r-pill);
+  font-size: 14px; font-weight: 600; line-height: 1;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { background: var(--orange-deep); }
+.btn-ghost { background: rgba(253,250,246,0.85); color: var(--ink); backdrop-filter: blur(8px); }
+.btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-green { background: var(--green); color: #fff; }
+.btn-dark { background: var(--ink); color: var(--surface); }
+
+/* Heart burst animation */
+@keyframes burst {
+  0%   { transform: scale(0)   translate(0, 0)   rotate(var(--rot, 0deg)); opacity: 1; }
+  100% { transform: scale(1) translate(var(--tx, 0), var(--ty, 0)) rotate(var(--rot, 0deg)); opacity: 0; }
+}
+.heart-burst-piece {
+  position: absolute;
+  left: 50%; top: 50%;
+  font-size: 14px;
+  pointer-events: none;
+  animation: burst 700ms cubic-bezier(.2,.7,.3,1) forwards;
+}
+
+@keyframes heart-pulse {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.45); }
+  60% { transform: scale(0.95); }
+}
+.heart-pulse { animation: heart-pulse 600ms cubic-bezier(.2,.7,.3,1); }
+
+/* Card stagger fade in */
+@keyframes fadeUp {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 600ms cubic-bezier(.2,.7,.3,1) both; }
+
+/* Screen transition — slide */
+@keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes sheetIn   { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes scaleIn   { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+
+.screen-enter { animation: slideInUp 320ms cubic-bezier(.2,.7,.3,1) both; }
+.sheet-enter  { animation: sheetIn 420ms cubic-bezier(.2,.7,.3,1) both; }
+
+/* Hide scrollbar but keep scrollable */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Stamp animation for cuisine passport */
+@keyframes stampDrop {
+  0%   { opacity: 0; transform: scale(2.4) rotate(-12deg); filter: blur(4px); }
+  40%  { opacity: 1; transform: scale(0.95) rotate(-4deg); filter: blur(0); }
+  55%  { transform: scale(1.05) rotate(-6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-6deg); }
+}
+.stamp-drop { animation: stampDrop 900ms cubic-bezier(.2,.9,.3,1) both; }
+
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+.draw-check {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: drawCheck 600ms 400ms ease-out both;
+}
+
+/* Map pin drop */
+@keyframes pinDrop {
+  0%   { transform: translate(-50%, calc(-100% - 40px)) scale(1.1); opacity: 0; }
+  60%  { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+  75%  { transform: translate(-50%, calc(-100% + 4px)) scale(0.96); }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+}
+
+/* Diagonal weave for sections */
+.weave-warm {
+  background:
+    radial-gradient(120% 80% at 20% 0%, #FDE6CF 0%, transparent 60%),
+    radial-gradient(100% 80% at 100% 100%, #F8D9C2 0%, transparent 55%),
+    var(--surface);
+}
+
+/* Hand-drawn underline accent */
+.handline {
+  position: relative;
+  display: inline-block;
+}
+.handline::after {
+  content: "";
+  position: absolute;
+  left: -2%; right: -2%;
+  bottom: -4px;
+  height: 6px;
+  background: var(--orange);
+  border-radius: 999px;
+  transform: rotate(-1deg) scaleX(0.96);
+  opacity: 0.85;
+}
+
+/* Tag chip on dark image */
+.chip-on-image {
+  background: rgba(26,21,18,0.42);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+}

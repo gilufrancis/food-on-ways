@@ -31,7 +31,7 @@ export default function CreatorPostCard({ post, index = 0 }) {
   };
 
   const handleMapPin = () => {
-    if (restaurant?.lat) navigate('/');
+    if (restaurant?.lat) navigate('/map');
   };
 
   return (
@@ -98,32 +98,36 @@ export default function CreatorPostCard({ post, index = 0 }) {
         )}
         {/* Restaurant pill floating at bottom-left */}
         {restaurant && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1.5"
+          <button
+            className="absolute bottom-3 left-3"
             style={{
-              background: 'rgba(26,21,18,0.58)',
-              backdropFilter: 'blur(10px)',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'rgba(253,250,246,0.96)',
+              backdropFilter: 'blur(12px)',
               borderRadius: 'var(--r-pill)',
-              padding: '5px 10px 5px 6px',
-              border: '1px solid rgba(255,255,255,0.15)',
+              padding: '8px 14px 8px 10px',
+              border: '1px solid rgba(255,255,255,0.7)',
+              boxShadow: 'var(--shadow-md)',
             }}
           >
-            <div style={{
-              width: 20, height: 20, borderRadius: '50%',
-              backgroundColor: 'var(--orange)',
+            <span style={{
+              width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+              backgroundColor: 'var(--orange)', color: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, flexShrink: 0,
             }}>
-              📍
-            </div>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>
-              {restaurant.name}
+              <PinFillIcon />
             </span>
-            {restaurant.location && (
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap' }}>
-                · {restaurant.location.split(',')[0]}
+            <span style={{ textAlign: 'left' }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 14, lineHeight: 1, color: 'var(--ink)' }}>
+                {restaurant.name}
               </span>
-            )}
-          </div>
+              {restaurant.location && (
+                <span style={{ display: 'block', fontSize: 10.5, color: 'var(--ink-3)', marginTop: 2 }}>
+                  {restaurant.location.split(',')[0]}
+                </span>
+              )}
+            </span>
+          </button>
         )}
       </div>
 
@@ -196,6 +200,14 @@ function MapPinIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+    </svg>
+  );
+}
+
+function PinFillIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
     </svg>
   );
 }

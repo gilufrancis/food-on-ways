@@ -56,6 +56,12 @@ export const creators = [
   },
 ];
 
+export const TIER_COLOR = {
+  Tastemaker: { bg: 'var(--amber-soft)', text: '#6E4A0F' },
+  Editor:     { bg: 'var(--green-soft)', text: 'var(--green)' },
+  Explorer:   { bg: 'var(--surface-3)',  text: 'var(--ink-3)' },
+};
+
 export function getCreator(id) {
   return creators.find(c => c.id === id);
 }

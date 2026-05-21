@@ -1,37 +1,43 @@
 @import "tailwindcss";
 
-/* ── Design tokens ── */
+/* ── Design Tokens — Food on Ways Handoff ── */
 :root {
+  /* Palette */
   --orange:       #F5622D;
   --orange-soft:  #FBE2D6;
   --orange-deep:  #C84313;
-  --surface:      #FDFAF6;
-  --surface-2:    #F6EFE5;
-  --surface-3:    #EFE5D5;
-  --ink:          #1A1512;
+  --surface:      #FDFAF6;   /* Warm off-white — app background */
+  --surface-2:    #F6EFE5;   /* Card / chip background */
+  --surface-3:    #EFE5D5;   /* Slightly deeper warm */
+  --ink:          #1A1512;   /* Warm charcoal — never pure black */
   --ink-2:        #4A3F36;
-  --ink-3:        #8B7B6E;
-  --ink-4:        #BCAE9F;
-  --line:         #E9DECE;
+  --ink-3:        #8B7B6E;   /* Tertiary — captions */
+  --ink-4:        #BCAE9F;   /* Quaternary — borders, disabled */
+  --line:         #E9DECE;   /* Card borders, dividers */
   --coral:        #E94B6A;
   --coral-soft:   #FDE0E6;
-  --green:        #2D6A4F;
-  --green-soft:   #D6E8DC;
-  --amber:        #F2A93D;
+  --green:        #2D6A4F;   /* Visited / success */
+  --green-soft:   #D6E8DC;   /* Green-tinted bg */
+  --amber:        #F2A93D;   /* Events, Tastemaker badge */
   --amber-soft:   #FBE7BE;
+  --cream:        #F1E6D2;
+  --plum:         #6E2B4A;
 
+  /* Radii */
   --r-sm:   10px;
   --r-md:   16px;
   --r-lg:   22px;
   --r-xl:   32px;
   --r-pill: 999px;
 
+  /* Warm-tinted shadows (never cold gray) */
   --shadow-sm: 0 2px 6px rgba(40,20,10,0.06);
   --shadow-md: 0 8px 24px rgba(40,20,10,0.10);
   --shadow-lg: 0 22px 48px rgba(40,20,10,0.16);
 
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-ui:      "DM Sans", "Inter", system-ui, -apple-system, sans-serif;
+  /* Typography */
+  --font-display: "Fraunces", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-ui:      "DM Sans", "Inter", system-ui, -apple-system, "Helvetica Neue", sans-serif;
   --font-mono:    "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
 }
 
@@ -47,9 +53,10 @@ html {
   font-size: 16px;
 }
 
+/* Outer shell — warm parchment so the phone "card" stands out */
 body {
   font-family: var(--font-ui);
-  background-color: var(--surface);
+  background-color: #2A201A;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -69,45 +76,38 @@ button, a, [role="button"] {
   font-family: inherit;
 }
 
-input, textarea {
-  font-family: inherit;
-  color: inherit;
-}
+input, textarea { font-family: inherit; color: inherit; }
 
 /* ── Leaflet ── */
-.leaflet-container {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
+.leaflet-container { width: 100%; height: 100%; z-index: 1; }
 
-/* ── Scrollbar utils ── */
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* ── Scrollbar hide ── */
+.hide-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.hide-scrollbar, .no-scrollbar, .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ── Typography helpers ── */
-.t-display {
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-  font-weight: 500;
-}
-.t-italic  { font-style: italic; }
-.t-caps    { text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; }
+/* ── Type helpers ── */
+.t-display { font-family: var(--font-display); letter-spacing: -0.02em; font-weight: 500; }
+.t-caps    { text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 600; }
 .t-mono    { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; }
 
 /* ── Image placeholder ── */
 .img-ph {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, var(--surface-3), var(--surface-2));
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--surface-3), #EDE5D8);
 }
 .img-ph::before {
-  content: "";
-  position: absolute; inset: 0;
-  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.025) 0 6px, transparent 6px 14px);
+  content: ""; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(46,37,32,0.03) 0 6px, transparent 6px 14px);
   pointer-events: none;
+}
+
+/* ── Card base — applied inline for precision ── */
+.card {
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ── Animations ── */
@@ -115,36 +115,34 @@ input, textarea {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-up { animation: fadeUp 600ms cubic-bezier(0.2,0.7,0.3,1) both; }
+.fade-up { animation: fadeUp 600ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
-.screen-enter { animation: slideInUp 320ms cubic-bezier(0.2,0.7,0.3,1) both; }
+.screen-enter { animation: slideInUp 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 
 @keyframes sheetIn {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
-.sheet-enter { animation: sheetIn 420ms cubic-bezier(0.2,0.7,0.3,1) both; }
+.sheet-enter { animation: sheetIn 420ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 
 @keyframes burst {
   0%   { transform: scale(0) translate(0,0) rotate(var(--rot,0deg)); opacity: 1; }
   100% { transform: scale(1) translate(var(--tx,0),var(--ty,0)) rotate(var(--rot,0deg)); opacity: 0; }
 }
 .heart-burst-piece {
-  position: absolute;
-  left: 50%; top: 50%;
-  font-size: 14px;
-  pointer-events: none;
+  position: absolute; left: 50%; top: 50%;
+  font-size: 14px; pointer-events: none;
   animation: burst 700ms cubic-bezier(0.2,0.7,0.3,1) forwards;
 }
 
 @keyframes heart-pulse {
   0%,100% { transform: scale(1); }
-  30%     { transform: scale(1.45); }
-  60%     { transform: scale(0.95); }
+  30% { transform: scale(1.45); }
+  60% { transform: scale(0.95); }
 }
 .heart-pulse { animation: heart-pulse 600ms cubic-bezier(0.2,0.7,0.3,1); }
 
@@ -156,30 +154,19 @@ input, textarea {
 }
 .stamp-drop { animation: stampDrop 900ms cubic-bezier(0.2,0.9,0.3,1) both; }
 
-@keyframes pinDrop {
-  0%  { transform: translate(-50%, calc(-100% - 40px)) scale(1.1); opacity:0; }
-  60% { transform: translate(-50%, -100%) scale(1); opacity:1; }
-  75% { transform: translate(-50%, calc(-100% + 4px)) scale(0.96); }
-  100%{ transform: translate(-50%, -100%) scale(1); opacity:1; }
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+.draw-check {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: drawCheck 600ms 400ms ease-out both;
 }
 
-/* ── Weave warm background ── */
+/* Diagonal weave warm background */
 .weave-warm {
   background:
-    radial-gradient(120% 80% at 20% 0%,   #FDE6CF 0%, transparent 60%),
+    radial-gradient(120% 80% at 20% 0%, #FDE6CF 0%, transparent 60%),
     radial-gradient(100% 80% at 100% 100%, #F8D9C2 0%, transparent 55%),
     var(--surface);
-}
-
-/* ── Hand-drawn underline ── */
-.handline { position: relative; display: inline-block; }
-.handline::after {
-  content: "";
-  position: absolute;
-  left: -2%; right: -2%; bottom: -4px;
-  height: 6px;
-  background: var(--orange);
-  border-radius: 999px;
-  transform: rotate(-1deg) scaleX(0.96);
-  opacity: 0.85;
 }

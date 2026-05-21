@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food on Ways · Hi-fi MVP</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- React + Babel (pinned) -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    body { background: #211912; }
+    .canvas-host { position: fixed; inset: 0; }
+    /* Artboard wrapper that sits inside DCArtboard children — gives a phone-bezel-less screen */
+    .ab-wrap {
+      width: 390px; height: 844px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.32);
+      position: relative;
+    }
+    /* Cover for "intro" artboard */
+    .intro-card {
+      width: 390px;
+      height: 844px;
+      padding: 60px 36px;
+      background: linear-gradient(160deg, #F5622D 0%, #C84313 55%, #6E2B4A 100%);
+      color: #fff;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border-radius: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-card::before {
+      content: ""; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 10px, transparent 10px 26px);
+    }
+    .intro-card .ink { position: relative; }
+  </style>
+</head>
+<body>
+  <div id="root" class="canvas-host"></div>
+
+  <!-- Sample data -->
+  <script src="data.js"></script>
+
+  <!-- Starter components (Babel) -->
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <!-- App components (Babel) -->
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="screens-home.jsx"></script>
+  <script type="text/babel" src="screens-detail.jsx"></script>
+  <script type="text/babel" src="screens-map.jsx"></script>
+  <script type="text/babel" src="screens-lists.jsx"></script>
+  <script type="text/babel" src="screens-add.jsx"></script>
+  <script type="text/babel" src="screens-stamp.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+
+  <!-- Tweakable defaults + Canvas composition -->
+  <script type="text/babel" data-presets="env,react">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "creatorsVisible": true,
+      "showStampOnLoad": false
+    }/*EDITMODE-END*/;
+
+    const Root = () => {
+      const [t, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+
+      return (
+        <>
+          <window.DesignCanvas defaultScale={0.55} bg="#211912">
+            <window.DCSection id="intro" title="Food on Ways" subtitle="Hi-fi MVP — bold/expressive direction. Kozhikode default · editorial type · warm map · hand-feel touches. Drag any artboard fullscreen via the focus button to use it like a real app.">
+
+              <window.DCArtboard id="cover" label="00 · Cover" width={390} height={844}>
+                <div className="intro-card">
+                  <div className="ink">
+                    <div style={{fontFamily:'JetBrains Mono', fontSize:10, letterSpacing:'0.16em', opacity:0.7}}>F.O.W · MVP · MAY 2026</div>
+                    <div style={{marginTop:18, fontFamily:'Fraunces', fontWeight:500, fontSize:64, lineHeight:0.92, letterSpacing:'-0.04em', textWrap:'pretty'}}>
+                      Food <span style={{fontStyle:'italic'}}>on</span><br/>Ways.
+                    </div>
+                    <div style={{marginTop:18, fontSize:14, lineHeight:1.45, opacity:0.92, maxWidth:280}}>
+                      A food explorer's companion — discover, save and visit great restaurants. Map-first. Creator-driven. Warm.
+                    </div>
+                  </div>
+                  <div className="ink" style={{display:'flex', flexDirection:'column', gap:10, fontSize:12}}>
+                    <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+                      {['Bold editorial type', 'Warm map tiles', 'Hand-feel touches', 'Creator feed', 'Cuisine passport'].map(t => (
+                        <span key={t} style={{padding:'5px 10px', borderRadius:999, background:'rgba(255,255,255,0.16)', border:'1px solid rgba(255,255,255,0.22)'}}>{t}</span>
+                      ))}
+                    </div>
+                    <div style={{marginTop:14, fontFamily:'JetBrains Mono', fontSize:10, opacity:0.75, letterSpacing:'0.08em'}}>↘ DRAG ARTBOARDS FULLSCREEN TO INTERACT</div>
+                  </div>
+                </div>
+              </window.DCArtboard>
+
+            </window.DCSection>
+
+            <window.DCSection id="core" title="Core flow" subtitle="The path a user actually walks: feed → restaurant → map. Tap into any artboard for a working interactive prototype — bottom-nav is wired throughout.">
+              <window.DCArtboard id="home" label="01 · Home Feed" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="01 Home Feed">
+                  <window.App initialScreen="home" hideCreators={!t.creatorsVisible} />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="detail" label="02 · Restaurant Detail" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="02 Restaurant Detail">
+                  <DetailArtboard />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="map" label="03 · Map" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="03 Map">
+                  <window.App initialScreen="map" hideCreators={!t.creatorsVisible} />
+                </div>
+              </window.DCArtboard>
+            </window.DCSection>
+
+            <window.DCSection id="memory" title="Save · Visit · Remember" subtitle="The retention loop. Wishlist is aspiration; Visited is a trophy shelf with a cuisine passport.">
+              <window.DCArtboard id="wishlist" label="04 · Wishlist" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="04 Wishlist">
+                  <window.App initialScreen="wishlist" hideCreators={!t.creatorsVisible} />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="visited" label="05 · Visited + Passport" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="05 Visited">
+                  <VisitedArtboard />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="profile" label="06 · Profile" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="06 Profile">
+                  <window.App initialScreen="profile" hideCreators={!t.creatorsVisible} />
+                </div>
+              </window.DCArtboard>
+            </window.DCSection>
+
+            <window.DCSection id="moments" title="Moments of delight" subtitle="The micro-moments that separate this from a generic listings app. Bottom sheet flow, pin-drop celebration, full-screen cuisine stamp unlock.">
+              <window.DCArtboard id="add" label="07 · Add a Place (Step 1)" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="07 Add Place">
+                  <AddArtboard step={1} />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="add2" label="08 · Add a Place (Memory)" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="08 Add Place memory">
+                  <AddArtboard step={3} />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="celebration" label="09 · Pin drop" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="09 Pin drop">
+                  <CelebrationArtboard />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="stamp" label="10 · Cuisine stamp unlock" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="10 Stamp unlock">
+                  <window.StampArtboard />
+                </div>
+              </window.DCArtboard>
+
+              <window.DCArtboard id="map-expanded" label="11 · Map · Expanded list" width={390} height={844}>
+                <div className="ab-wrap" data-screen-label="11 Map expanded list">
+                  <window.App initialScreen="map" mapExpanded={true} hideCreators={!t.creatorsVisible} />
+                </div>
+              </window.DCArtboard>
+            </window.DCSection>
+          </window.DesignCanvas>
+
+          {/* Tweaks panel */}
+          <window.TweaksPanel title="Tweaks">
+            <window.TweakSection label="Feed">
+              <window.TweakToggle
+                label="Creators visible"
+                value={t.creatorsVisible}
+                onChange={(v) => setTweak('creatorsVisible', v)}
+              />
+              <div style={{fontSize:11, color:'#888', padding:'2px 12px 6px'}}>
+                Toggles the entire Fresh-from-creators feed across every Home artboard. When off, an editorial nudge takes its place.
+              </div>
+            </window.TweakSection>
+            <window.TweakSection label="How to use">
+              <div style={{fontSize:11, color:'#888', padding:'2px 12px 6px', lineHeight:1.4}}>
+                Hover any artboard and tap ⛶ to focus fullscreen. Bottom-nav, wishlist hearts, map pins, the Add flow and the cuisine stamp all respond to taps.
+              </div>
+            </window.TweakSection>
+          </window.TweaksPanel>
+        </>
+      );
+    };
+
+    // Detail artboard — pre-loaded onto Paragon
+    const DetailArtboard = () => {
+      const [wishlist, setWishlist] = React.useState(['paragon','appammachi']);
+      const [visited, setVisited] = React.useState([]);
+      const [back, setBack] = React.useState(false);
+      const r = window.FOW_DATA.restaurants[0];
+      const state = { wishlist, visited, city: 'Kozhikode' };
+      const actions = {
+        back: () => setBack(true),
+        toggleWishlist: (id) => setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]),
+        toggleVisited: (id) => setVisited(v => v.includes(id) ? v.filter(x => x !== id) : [...v, id]),
+        openRestaurant: () => {},
+      };
+      if (back) {
+        return <window.App initialScreen="home" />;
+      }
+      return <window.RestaurantDetail restaurant={r} state={state} actions={actions} />;
+    };
+
+    // Visited artboard — pre-seeded with several visited restaurants so passport has stamps
+    const VisitedArtboard = () => {
+      const [wishlist, setWishlist] = React.useState(['kayees']);
+      const [visited, setVisited] = React.useState(['paragon','sagar','topform','appammachi','moplah']);
+      const state = { wishlist, visited, city: 'Kozhikode' };
+      const actions = {
+        go: () => {},
+        openRestaurant: () => {},
+        toggleWishlist: (id) => setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]),
+        toggleVisited: (id) => setVisited(v => v.includes(id) ? v.filter(x => x !== id) : [...v, id]),
+      };
+      return (
+        <>
+          <window.VisitedScreen state={state} actions={actions} />
+          <window.BottomNav active="visited" onChange={() => {}} badges={{wishlist: 1}} />
+        </>
+      );
+    };
+
+    // Add a place artboard — opens on a static Home behind, sheet pinned open at the step
+    const AddArtboard = ({step}) => {
+      const [done, setDone] = React.useState(false);
+      const [picked, setPicked] = React.useState(window.FOW_DATA.restaurants[0]);
+      const [mode, setMode] = React.useState('visited');
+      const [open, setOpen] = React.useState(true);
+      // Force the AddSheet to start at requested step by re-mounting key
+      const [key, setKey] = React.useState(0);
+      return (
+        <>
+          <div style={{position:'absolute', inset:0, background:'var(--surface)'}}>
+            <window.App initialScreen="home" hideCreators={false} />
+          </div>
+          {open && (
+            <AddSheetPrefilled
+              key={key}
+              startStep={step}
+              picked={picked}
+              modeStart={mode}
+              onClose={() => { setOpen(false); setKey(k=>k+1); setTimeout(() => setOpen(true), 200); }}
+            />
+          )}
+        </>
+      );
+    };
+
+    // Variant that lets us seed step/picked/mode
+    const AddSheetPrefilled = ({startStep, picked, modeStart, onClose}) => {
+      const [step, setStep] = React.useState(startStep);
+      const [mode, setMode] = React.useState(modeStart);
+      const [dish, setDish] = React.useState(null);
+      const [sentiment, setSentiment] = React.useState('😍');
+
+      const next = () => setStep(s => s + 1);
+      const back = () => setStep(s => Math.max(1, s - 1));
+
+      return (
+        <>
+          <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(20,10,5,0.42)', backdropFilter: 'blur(4px)', zIndex: 90, animation: 'scaleIn 200ms both' }} />
+          <div className="sheet-enter" style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0,
+            background: 'var(--surface)',
+            borderRadius: '28px 28px 0 0',
+            boxShadow: '0 -20px 50px rgba(40,20,10,0.30)',
+            zIndex: 95,
+            paddingBottom: 24,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 6px' }}>
+              <div style={{ width: 38, height: 4, borderRadius: 4, background: 'var(--ink-4)' }} />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 22px 12px' }}>
+              <div className="t-caps" style={{ color: 'var(--orange)' }}>Plant a flag · Step {step}/3</div>
+              <button onClick={onClose} style={{ color: 'var(--ink-3)', padding: 4 }}>
+                <window.Icon name="close" size={20} />
+              </button>
+            </div>
+
+            {step === 1 && (
+              <div style={{ padding: '0 22px 18px' }}>
+                <div className="t-display" style={{ fontSize: 28, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.02em' }}>
+                  Which restaurant?
+                </div>
+                <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'var(--surface-2)', borderRadius: 16 }}>
+                  <window.Icon name="search" size={18} color="var(--ink-3)" />
+                  <input placeholder="Type or paste a name..." style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 15 }} />
+                </div>
+                <div style={{ marginTop: 12, display: 'flex', gap: 10 }}>
+                  <button style={{ flex: 1, padding: 14, borderRadius: 16, background: 'var(--surface-2)', display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600 }}>
+                    <window.Icon name="locate" size={16} color="var(--orange)" />Use my location
+                  </button>
+                  <button style={{ flex: 1, padding: 14, borderRadius: 16, background: 'var(--surface-2)', display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 600 }}>
+                    <window.Icon name="pinFill" size={16} color="var(--orange)" />Drop a pin
+                  </button>
+                </div>
+                <div className="t-caps" style={{ color: 'var(--ink-3)', marginTop: 18, marginBottom: 10 }}>Suggested nearby</div>
+                {window.FOW_DATA.restaurants.slice(0,4).map(r => (
+                  <button key={r.id} onClick={() => setStep(3)} style={{ width: '100%', display: 'flex', gap: 12, padding: 10, textAlign: 'left', borderRadius: 14, background: 'transparent' }}>
+                    <window.ImgPh palette={r.palette} src={r.img} tag="" showTag={false} style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{r.name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--ink-3)' }}>{r.cuisines[0]} · {r.area}, {r.city}</div>
+                    </div>
+                    <window.Icon name="chevronRight" size={18} color="var(--ink-3)" style={{ alignSelf: 'center' }} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {step === 3 && (
+              <div style={{ padding: '0 22px 18px' }}>
+                <button onClick={back} style={{ fontSize: 12, color: 'var(--ink-3)', display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                  <window.Icon name="arrowLeft" size={14} /> back
+                </button>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 16 }}>
+                  <window.ImgPh palette={picked.palette} src={picked.img} tag="" showTag={false} style={{ width: 54, height: 54, borderRadius: 14 }} />
+                  <div>
+                    <div className="t-display" style={{ fontSize: 18, fontWeight: 600 }}>{picked.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--ink-3)' }}>{picked.area}, {picked.city}</div>
+                  </div>
+                </div>
+                <div className="t-display" style={{ fontSize: 24, lineHeight: 1.1, fontWeight: 500 }}>
+                  What did you <span className="t-italic">have?</span>
+                </div>
+                <div style={{ marginTop: 14, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {picked.mustOrder.concat([{ name: 'Something else…' }]).map(d => (
+                    <button key={d.name} onClick={() => setDish(d.name)} className="pill"
+                      style={{
+                        background: dish === d.name ? 'var(--ink)' : 'var(--surface-2)',
+                        color: dish === d.name ? '#fff' : 'var(--ink)',
+                        border: 'none', fontWeight: 600, padding: '8px 14px', fontSize: 13,
+                      }}>{d.name}</button>
+                  ))}
+                </div>
+                <div style={{ marginTop: 20 }}>
+                  <div className="t-caps" style={{ color: 'var(--ink-3)' }}>How was it?</div>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+                    {['😍', '🙂', '😐', '😕'].map(em => (
+                      <button key={em} onClick={() => setSentiment(em)} style={{
+                        flex: 1, height: 58, borderRadius: 16,
+                        background: sentiment === em ? 'var(--orange-soft)' : 'var(--surface-2)',
+                        border: sentiment === em ? '2px solid var(--orange)' : '2px solid transparent',
+                        fontSize: 26,
+                      }}>{em}</button>
+                    ))}
+                  </div>
+                </div>
+                <button style={{ marginTop: 16, width: '100%', padding: 18, borderRadius: 18, background: 'var(--surface-2)', border: '2px dashed var(--ink-4)', color: 'var(--ink-3)', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <window.Icon name="camera" size={18} /> Add a photo
+                </button>
+                <button onClick={onClose} className="btn btn-green" style={{ width: '100%', marginTop: 18 }}>
+                  <window.Icon name="check" size={16} stroke={2.4} /> Stamp it · Save to Visited
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      );
+    };
+
+    const CelebrationArtboard = () => {
+      const [show, setShow] = React.useState(true);
+      const [key, setKey] = React.useState(0);
+      return (
+        <>
+          <div style={{position:'absolute', inset:0}}>
+            <window.App initialScreen="map" />
+          </div>
+          {show && (
+            <window.PinDropCelebration
+              key={key}
+              active
+              mode="visited"
+              restaurant={window.FOW_DATA.restaurants[0]}
+              onDone={() => { setShow(false); setTimeout(() => { setShow(true); setKey(k=>k+1); }, 400); }}
+            />
+          )}
+        </>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<Root />);
+  </script>
+</body>
+</html>
