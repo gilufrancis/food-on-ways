@@ -71,37 +71,38 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* ── Floating + FAB (sits in the page flow via the container) ── */}
-      {/* Rendered as a portal-like fixed element capped at max-w-md */}
+      {/* ── Floating + FAB — above bottom nav ── */}
       <div
         style={{
           position: 'fixed',
-          top: 66,
+          bottom: 'calc(72px + env(safe-area-inset-bottom))',
           left: '50%',
           transform: 'translateX(-50%)',
           width: '100%',
           maxWidth: 448,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          paddingRight: 16,
           pointerEvents: 'none',
           zIndex: 50,
         }}
       >
-        <div style={{ position: 'absolute', right: 16, top: 0, pointerEvents: 'all' }}>
-          <button
-            onClick={() => setOpen(true)}
-            style={{
-              width: 52, height: 52, borderRadius: '50%',
-              backgroundColor: 'var(--orange)',
-              color: '#fff',
-              fontSize: 28, fontWeight: 300, lineHeight: 1,
-              border: 'none',
-              boxShadow: '0 4px 16px rgba(245,98,45,0.45)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-            aria-label="Add restaurant"
-          >
-            +
-          </button>
-        </div>
+        <button
+          onClick={() => setOpen(true)}
+          style={{
+            pointerEvents: 'all',
+            width: 56, height: 56, borderRadius: '50%',
+            backgroundColor: 'var(--orange)',
+            color: '#fff',
+            fontSize: 28, fontWeight: 300, lineHeight: 1,
+            border: 'none',
+            boxShadow: '0 6px 20px rgba(245,98,45,0.45)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          aria-label="Add restaurant"
+        >
+          +
+        </button>
       </div>
 
       {/* ── Bottom nav ── */}
